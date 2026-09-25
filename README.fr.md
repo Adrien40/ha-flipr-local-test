@@ -6,7 +6,7 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 
 [![Tests](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/tests.yaml?branch=main&label=tests)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/tests.yaml)
-[![Validate](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/hacs.yaml?branch=main&label=hassfest%2Fhacs)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/hacs.yaml)
+[![Validate](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/validate.yaml?branch=main&label=hassfest%2Fhacs)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/validate.yaml)
 [![Linting](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/ruff.yaml?branch=main&label=lint)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/ruff.yaml)
 [![CodeQL](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/codeql.yaml?branch=main&label=codeql)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/codeql.yaml)
 [![Quality Scale](https://img.shields.io/badge/HA%20Quality%20Scale-Silver-silver)](custom_components/flipr_local/quality_scale.yaml)

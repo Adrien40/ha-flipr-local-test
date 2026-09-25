@@ -7,13 +7,15 @@ from datetime import time
 from homeassistant.components.time import TimeEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
     CONF_MAC_ADDRESS,
     CONF_REFERENCE_TIME,
+    DOMAIN,
     flipr_device_info,
 )
 from .model import get_flipr_model
@@ -47,11 +49,59 @@ class FliprReferenceTime(CoordinatorEntity, TimeEntity):
         self._entry_id = entry_id
         self._attr_unique_id = f"{mac}_{CONF_REFERENCE_TIME}"
         self._attr_device_info = flipr_device_info(mac, model_name)
+        # Last value seen in the options: only react to an actual change
+        # in the options (see _handle_options_updated).
+        self._last_option_val: str | None = None
+
+    def _read_option_value(self) -> str | None:
+        entry = self.hass.config_entries.async_get_entry(self._entry_id)
+        if entry and CONF_REFERENCE_TIME in entry.options:
+            return str(entry.options[CONF_REFERENCE_TIME])
+        return None
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+
+        time_str = self.coordinator.data.get(CONF_REFERENCE_TIME)
+        if time_str is None:
+            time_str = self._read_option_value()
+        if time_str is None:
+            entry = self.hass.config_entries.async_get_entry(self._entry_id)
+            if entry and CONF_REFERENCE_TIME in entry.data:
+                time_str = str(entry.data[CONF_REFERENCE_TIME])
+        if time_str is None:
+            time_str = "08:00"
+
+        self._last_option_val = self._read_option_value()
+        self.coordinator.update_volatile_state({CONF_REFERENCE_TIME: time_str})
+
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass,
+                f"{DOMAIN}_{self._mac}_options_updated",
+                self._handle_options_updated,
+            )
+        )
+
+        self.async_write_ha_state()
+
+    @callback
+    def _handle_options_updated(self) -> None:
+        # Only apply the option if it changed: otherwise a change made
+        # through this entity would be overwritten by the old options value as
+        # soon as ANOTHER setting is changed (e.g. the chlorine/bromine selector).
+        new_val = self._read_option_value()
+        if new_val is not None and new_val != self._last_option_val:
+            self._last_option_val = new_val
+            current_val = self.coordinator.data.get(CONF_REFERENCE_TIME)
+            if new_val != current_val:
+                self.coordinator.update_local_state({CONF_REFERENCE_TIME: new_val})
+        self.async_write_ha_state()
 
     @property
     def native_value(self) -> time | None:
         time_str = self.coordinator.data.get(CONF_REFERENCE_TIME)
-        if time_str is None:
+        if not time_str:
             entry = self.hass.config_entries.async_get_entry(self._entry_id)
             if entry:
                 time_str = entry.options.get(
@@ -69,3 +119,4 @@ class FliprReferenceTime(CoordinatorEntity, TimeEntity):
     async def async_set_value(self, value: time) -> None:
         time_str = value.strftime("%H:%M")
         self.coordinator.update_local_state({CONF_REFERENCE_TIME: time_str})
+        self.async_write_ha_state()

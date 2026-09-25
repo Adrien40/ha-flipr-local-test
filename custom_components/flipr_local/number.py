@@ -110,6 +110,21 @@ class FliprUpdateIntervalNumber(CoordinatorEntity, RestoreNumber):
         self._attr_entity_category = EntityCategory.CONFIG
         self._attr_mode = "box"
         self._attr_device_info = flipr_device_info(mac, model_name)
+        # Last value seen in the options: only react to an actual change
+        # in the options (see _handle_options_updated).
+        self._last_option_val: int | None = None
+
+    def _read_option_value(self) -> int | None:
+        entry = self.hass.config_entries.async_get_entry(self._entry_id)
+        if entry and CONF_SCAN_INTERVAL in entry.options:
+            return max(
+                int(self._attr_native_min_value),
+                min(
+                    round(float(entry.options[CONF_SCAN_INTERVAL])),
+                    int(self._attr_native_max_value),
+                ),
+            )
+        return None
 
     async def async_added_to_hass(self) -> None:
         await super().async_added_to_hass()
@@ -132,8 +147,31 @@ class FliprUpdateIntervalNumber(CoordinatorEntity, RestoreNumber):
 
         val = max(self._attr_native_min_value, min(val, self._attr_native_max_value))
         self._attr_native_value = val
+        self._last_option_val = self._read_option_value()
 
         self.coordinator.update_volatile_state({CONF_SCAN_INTERVAL: val})
+
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass,
+                f"{DOMAIN}_{self._mac}_options_updated",
+                self._handle_options_updated,
+            )
+        )
+
+        self.async_write_ha_state()
+
+    @callback
+    def _handle_options_updated(self) -> None:
+        # Only apply the option if it changed: otherwise a change made
+        # through this entity would be overwritten by the old options value as
+        # soon as ANOTHER setting is changed (e.g. the chlorine/bromine selector).
+        new_val = self._read_option_value()
+        if new_val is not None and new_val != self._last_option_val:
+            self._last_option_val = new_val
+            if new_val != self._attr_native_value:
+                self._attr_native_value = new_val
+                self.coordinator.update_local_state({CONF_SCAN_INTERVAL: new_val})
         self.async_write_ha_state()
 
     async def async_set_native_value(self, value: float) -> None:

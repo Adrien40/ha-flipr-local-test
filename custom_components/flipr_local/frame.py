@@ -10,7 +10,11 @@ Frame layout (13 bytes, little-endian):
     byte  8      sync mode              (0-3)
     bytes 11-12  battery voltage        (mV)
 
-Isolating this decoding from the coordinator lets it be tested without hardware.
+Bytes 6-7 and 9-10 are not decoded here (unused/reserved by the device
+protocol) but carry a rolling counter/checksum that changes on every
+transmitted frame, even when the measured values are unchanged. This
+guarantees two consecutive frames are never byte-identical, which
+coordinator.py relies on to detect a fresh reading (see reference_frame_bytes).
 """
 
 from __future__ import annotations

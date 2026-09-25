@@ -76,7 +76,8 @@
       "temp_threshold_error": "❌ Minimalna temperatura mora biti niža od maksimalne temperature"
     },
     "abort": {
-      "already_configured": "⚠️ Ovaj uređaj je već konfiguriran"
+      "already_configured": "⚠️ Ovaj uređaj je već konfiguriran",
+      "reconfigure_successful": "Uređaj je uspješno rekonfiguriran."
     }
   },
   "options": {

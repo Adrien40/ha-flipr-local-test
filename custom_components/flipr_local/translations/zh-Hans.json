@@ -76,7 +76,8 @@
       "temp_threshold_error": "❌ 最低温度必须低于最高温度"
     },
     "abort": {
-      "already_configured": "⚠️ 此设备已配置"
+      "already_configured": "⚠️ 此设备已配置",
+      "reconfigure_successful": "设备重新配置成功。"
     }
   },
   "options": {

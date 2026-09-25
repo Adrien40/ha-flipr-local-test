@@ -14,12 +14,12 @@ If you do not have your raw data, simply open the official Flipr app, navigate t
 <img src="docs/screenshots/flipr_calibration.png" width="400" alt="Flipr Calibration">
 
 ### ⚡ Method B: Raw millivolt values (Advanced)
-The integration exposes a `sensor.*_ph_brut_mv` entity that displays the raw voltage of your pH probe in mV 📉. Note the value once the Flipr is immersed and stabilized in the calibration solution (e.g., `1600` or `1900`), then enter these values directly in the configuration via the gear icon.
+The integration exposes a `sensor.*_raw_ph_mv` entity that displays the raw voltage of your pH probe in mV 📉. Note the value once the Flipr is immersed and stabilized in the calibration solution (e.g., `1600` or `1900`), then enter these values directly in the configuration via the gear icon.
 
 ![Raw pH (mV)](docs/screenshots/raw_ph_values_mv.png)
 
 ### 🔋 What about Redox (ORP)?
-The principle is identical. The `sensor.*_redox_brut_mv` entity displays the **raw** value from the Redox probe, before any offset is applied. Immerse the Flipr into a Redox calibration solution (e.g., 650 mV), wait for the value to stabilize, then enter it into **ORP (Redox) Value**, and enter the reference value in **ORP (Redox) Solution Target**. The integration applies the difference to all readings.
+The principle is identical. The `sensor.*_raw_orp_mv` entity displays the **raw** value from the Redox probe, before any offset is applied. Immerse the Flipr into a Redox calibration solution (e.g., 650 mV), wait for the value to stabilize, then enter it into **ORP (Redox) Value**, and enter the reference value in **ORP (Redox) Solution Target**. The integration applies the difference to all readings.
 
 ---
 
@@ -42,7 +42,7 @@ This precise value is what you need to enter into the **Solution Target** fields
 
 The integration automatically creates binary status sensors (pH Status, Redox Status, Temperature Status). You can define your own thresholds in the configuration:
 * ⚖️ **pH Min / Max:** (Default: 6.90 - 7.50)
-* 🛡️ **Redox Min:** (Default: 650 mV)
+* 🛡️ **ORP Min / Max:** (Default: 650 - 800 mV)
 * ❄️ **Min Temperature:** Useful to anticipate freezing risk during winter (Default: 6.0°C)
 * 🥵 **Max Temperature:** Useful to prevent water from turning if it gets too hot (Default: 32.0°C)
 

@@ -15,6 +15,7 @@
   l'entité existante **Intervalle d'analyse** alimente désormais ce mécanisme au lieu d'écrire
   directement dans l'intervalle de rafraîchissement du coordinateur. Les deux sont aussi configurables
   depuis l'assistant d'installation et les options au sein d'une nouvelle section **Synchronisation**.
+- Fiche de l'appareil (`DeviceInfo`) enrichie : ajout de la connexion Bluetooth avec l'adresse MAC, renseignement du numéro de série (extrait du nom de l'appareil, ex. `F3A12BC`, ou adresse MAC en repli) et pré-affectation automatique à la pièce « Piscine ».
 
 ### Supprimé (changement cassant)
 - Capteurs **Chlore Libre Estimé** et **Chlore Actif (HOCl)**. Pourquoi :
@@ -93,7 +94,6 @@
 - `calibration_help.md` / `calibration_help.fr.md` : guide désormais scindé en versions Anglaise
   et Française, calibration du Redox brut, libellé « Chlore / Redox Statut » corrigé en « Redox Statut ».
 - `CHANGELOG.md` / `CHANGELOG.fr.md` : mise en place des journaux de modifications en Anglais et en Français.
-- `info.md` : mention infondée de « Machine Learning » retirée.
 
 ## 1.1.0
 

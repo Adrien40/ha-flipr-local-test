@@ -76,7 +76,8 @@
       "temp_threshold_error": "❌ Minimumstemperatur skal være lavere end maksimumstemperatur"
     },
     "abort": {
-      "already_configured": "⚠️ Denne enhed er allerede konfigureret"
+      "already_configured": "⚠️ Denne enhed er allerede konfigureret",
+      "reconfigure_successful": "Enheden blev genkonfigureret."
     }
   },
   "options": {

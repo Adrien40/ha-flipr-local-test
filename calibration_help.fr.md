@@ -42,7 +42,7 @@ C'est cette valeur très précise que vous devez saisir dans les champs **Cible 
 
 L'intégration crée automatiquement des capteurs binaires de statut (pH Statut, Redox Statut, Température Statut). Vous pouvez définir vos propres limites dans la configuration :
 * ⚖️ **pH Min / Max :** (Défaut : 6.90 - 7.50)
-* 🛡️ **Redox Min :** (Défaut : 650 mV)
+* 🛡️ **Redox Min / Max :** (Défaut : 650 - 800 mV)
 * ❄️ **Température Min :** Utile pour anticiper le risque de gel l'hiver (Défaut : 6.0°C)
 * 🥵 **Température Max :** Pratique pour éviter que l'eau ne tourne si elle chauffe trop (Défaut : 32.0°C)
 

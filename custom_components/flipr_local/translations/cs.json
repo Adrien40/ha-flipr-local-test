@@ -76,7 +76,8 @@
       "temp_threshold_error": "❌ Minimální teplota musí být nižší než maximální teplota"
     },
     "abort": {
-      "already_configured": "⚠️ Toto zařízení je již nakonfigurováno"
+      "already_configured": "⚠️ Toto zařízení je již nakonfigurováno",
+      "reconfigure_successful": "Zařízení bylo úspěšně překonfigurováno."
     }
   },
   "options": {

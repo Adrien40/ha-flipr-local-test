@@ -76,7 +76,8 @@
       "temp_threshold_error": "❌ Minsta temperatur måste vara lägre än maximal temperatur"
     },
     "abort": {
-      "already_configured": "⚠️ Den här enheten är redan konfigurerad"
+      "already_configured": "⚠️ Den här enheten är redan konfigurerad",
+      "reconfigure_successful": "Enheten har konfigurerats om."
     }
   },
   "options": {

@@ -76,7 +76,8 @@
       "temp_threshold_error": "❌ A minimum hőmérsékletnek alacsonyabbnak kell lennie a maximum hőmérsékletnél"
     },
     "abort": {
-      "already_configured": "⚠️ Ez az eszköz már be van állítva"
+      "already_configured": "⚠️ Ez az eszköz már be van állítva",
+      "reconfigure_successful": "Az eszköz sikeresen újrakonfigurálva."
     }
   },
   "options": {

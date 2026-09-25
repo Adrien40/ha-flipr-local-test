@@ -3,7 +3,7 @@
 
 from datetime import timedelta
 
-from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.device_registry import CONNECTION_BLUETOOTH, DeviceInfo
 
 DOMAIN = "flipr_local"
 
@@ -111,7 +111,9 @@ DEFAULT_PH_REF_4: float = 4.00
 def flipr_device_info(mac: str, model_name: str) -> DeviceInfo:
     return DeviceInfo(
         identifiers={(DOMAIN, mac)},
+        connections={(CONNECTION_BLUETOOTH, mac)},
         name=model_name,
         manufacturer="Flipr",
         model=model_name,
+        suggested_area="Piscine",
     )

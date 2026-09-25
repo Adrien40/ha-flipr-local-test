@@ -16,6 +16,7 @@
   writing directly to the coordinator's update interval. Both are now also
   configurable directly from the setup and options wizard, in a new
   **Synchronization** section.
+- Enriched device registry entry (`DeviceInfo`): added Bluetooth MAC connection, hardware serial number (extracted from device name, e.g. `F3A12BC`, falling back to MAC), and suggested area set to "Piscine".
 
 ### Removed (breaking)
 - Sensors **Estimated Free Chlorine** and **Active Chlorine (HOCl)**. Why:
@@ -93,7 +94,6 @@
 - `calibration_help.md` / `calibration_help.fr.md`: guide now split into English and French versions,
   raw ORP calibration, "Chlore / Redox Statut" label corrected to "Redox Statut".
 - `CHANGELOG.md` / `CHANGELOG.fr.md`: added English and French changelog files.
-- `info.md`: unfounded "Machine Learning" claim removed.
 
 ## 1.1.0
 

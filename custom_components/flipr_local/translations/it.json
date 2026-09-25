@@ -76,7 +76,8 @@
       "temp_threshold_error": "❌ La temperatura minima deve essere inferiore alla temperatura massima"
     },
     "abort": {
-      "already_configured": "⚠️ Questo dispositivo è già configurato"
+      "already_configured": "⚠️ Questo dispositivo è già configurato",
+      "reconfigure_successful": "Dispositivo riconfigurato con successo."
     }
   },
   "options": {

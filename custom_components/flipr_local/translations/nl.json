@@ -76,7 +76,8 @@
       "temp_threshold_error": "❌ Minimumtemperatuur moet lager zijn dan maximumtemperatuur"
     },
     "abort": {
-      "already_configured": "⚠️ Dit apparaat is al geconfigureerd"
+      "already_configured": "⚠️ Dit apparaat is al geconfigureerd",
+      "reconfigure_successful": "Apparaat succesvol opnieuw geconfigureerd."
     }
   },
   "options": {

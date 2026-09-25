@@ -810,6 +810,11 @@ class FliprDataCoordinator(DataUpdateCoordinator):
                                     received_data_queue.get(), timeout=time_left
                                 )
 
+                                # Full byte-equality check (not just the decoded fields): the
+                                # device embeds a rolling counter/checksum in the unused bytes
+                                # (see frame.py), so two consecutive frames are never identical
+                                # even at constant water values — safe way to detect "new data
+                                # received" rather than a risk of false rejection.
                                 if len(payload) == FRAME_LENGTH_BYTES and (
                                     not reference_frame_bytes
                                     or payload != reference_frame_bytes
@@ -852,6 +857,10 @@ class FliprDataCoordinator(DataUpdateCoordinator):
                                         else "NONE",
                                     )
 
+                                    # Same rationale as the notify branch above: the rolling
+                                    # counter/checksum in the frame's unused bytes guarantees
+                                    # byte-inequality on every genuinely new frame, even when
+                                    # the measured values themselves haven't moved.
                                     if len(payload) == FRAME_LENGTH_BYTES and (
                                         not reference_frame_bytes
                                         or payload != reference_frame_bytes
@@ -1002,6 +1011,7 @@ class FliprDataCoordinator(DataUpdateCoordinator):
                 derived["temperature"], derived["ph"], tac_val, th_val, tds_val
             )
         )
+        self.update_schedule()
         self._schedule_save()
         return new_data
 

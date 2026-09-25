@@ -4,9 +4,7 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub Release](https://img.shields.io/github/v/release/Adrien40/ha-flipr-local)](https://github.com/Adrien40/ha-flipr-local/releases)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/Adrien40/ha-flipr-local/blob/main/LICENSE)
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-[![GitHub Release](https://img.shields.io/github/v/release/Adrien40/ha-flipr-local-test)](https://github.com/Adrien40/ha-flipr-local-test/releases)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/Adrien40/ha-flipr-local-test/blob/main/LICENSE)
+
 [![Tests](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/tests.yml?branch=main&label=tests)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/tests.yml)
 [![Validate](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/validate.yml?branch=main&label=hassfest%2Fhacs)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/validate.yml)
 [![Linting](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/lint.yml?branch=main&label=lint)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/lint.yml)

@@ -1,0 +1,31 @@
+[tool.ruff]
+# Python 3.14 (minimum Home Assistant 2026.3.0): `ruff format` writes `except A, B:` without
+# parentheses (PEP 758). This is valid and intentional, not a typo.
+target-version = "py314"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "RUF"]
+ignore = [
+    "E501",   # les longues chaînes de log sont laissées à `ruff format`
+    "RUF001", # caractères Unicode volontaires (×, ÷, →, accents) dans docs/logs
+    "RUF002",
+    "RUF003",
+    "RUF012", # attributs de classe _attr_options = [...] : convention Home Assistant
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["custom_components"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-p no:sugar"
+
+[tool.coverage.run]
+source = ["custom_components/flipr_local"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false

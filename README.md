@@ -5,10 +5,10 @@
 [![GitHub Release](https://img.shields.io/github/v/release/Adrien40/ha-flipr-local)](https://github.com/Adrien40/ha-flipr-local/releases)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/Adrien40/ha-flipr-local/blob/main/LICENSE)
 
-[![Tests](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/tests.yml?branch=main&label=tests)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/tests.yml)
-[![Validate](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/validate.yml?branch=main&label=hassfest%2Fhacs)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/validate.yml)
-[![Linting](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/lint.yml?branch=main&label=lint)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/lint.yml)
-[![CodeQL](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/codeql.yml?branch=main&label=codeql)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/codeql.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/tests.yml?branch=main&label=tests)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/tests.yaml)
+[![Validate](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/validate.yml?branch=main&label=hassfest%2Fhacs)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/validate.yaml)
+[![Linting](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/lint.yml?branch=main&label=lint)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/ruff.yaml)
+[![CodeQL](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local-test/codeql.yml?branch=main&label=codeql)](https://github.com/Adrien40/ha-flipr-local-test/actions/workflows/codeql.yaml)
 [![Quality Scale](https://img.shields.io/badge/HA%20Quality%20Scale-Silver-silver)](custom_components/flipr_local/quality_scale.yaml)
 
 If you find this project useful, you can support its development 🙏

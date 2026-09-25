@@ -1,31 +1,5 @@
 # Changelog
 
-## 1.2.1
-
-### Fixed
-- `start_notify`, `stop_notify`, `disconnect` and the direct read used by
-  "Flipr Start Max" had no timeout: an unresponsive BLE stack after a
-  successful connection could block the update cycle indefinitely. All four
-  are now bounded by the new `TIMEOUT_GATT_OP` (10s), matching Blue Connect
-  Local.
-- The notification queue overflow handler wrapped the wrong call:
-  `call_soon_threadsafe` was inside the `try`, but it never raises
-  `QueueFull` itself (it only schedules `put_nowait`, which runs later,
-  outside the `try`). A burst of notifications overflowing the queue
-  therefore surfaced as an unhandled "Error doing job" exception instead of
-  the intended clean debug log. Fixed by moving the `try`/`except` to where
-  `put_nowait` actually runs, matching the pattern already used by Blue
-  Connect Local.
-
-### Added
-- Scheduled analyses are now aligned on slots (interval + reference time),
-  matching Blue Connect Local, instead of a flat rolling interval. New
-  **Reference Time** entity to set the alignment anchor (default 08:00); the
-  existing **Analysis Interval** entity now feeds this mechanism instead of
-  writing directly to the coordinator's update interval. Both are now also
-  configurable directly from the setup and options wizard, in a new
-  **Synchronization** section.
-
 ## 1.2.0
 
 ### Requirements (breaking)
@@ -35,6 +9,13 @@
 ### Added
 - **Raw ORP (mV)** diagnostic sensor, next to the existing raw pH: the probe value *before* any
   offset, to calibrate on a reference solution.
+- Scheduled analyses are now aligned on slots (interval + reference time),
+  matching Blue Connect Local, instead of a flat rolling interval. New
+  **Reference Time** entity to set the alignment anchor (default 08:00); the
+  existing **Analysis Interval** entity now feeds this mechanism instead of
+  writing directly to the coordinator's update interval. Both are now also
+  configurable directly from the setup and options wizard, in a new
+  **Synchronization** section.
 
 ### Removed (breaking)
 - Sensors **Estimated Free Chlorine** and **Active Chlorine (HOCl)**. Why:
@@ -63,6 +44,19 @@
   no longer stay armed and bypass the pause later.
 
 ### Fixed
+- `start_notify`, `stop_notify`, `disconnect` and the direct read used by
+  "Flipr Start Max" had no timeout: an unresponsive BLE stack after a
+  successful connection could block the update cycle indefinitely. All four
+  are now bounded by the new `TIMEOUT_GATT_OP` (10s), matching Blue Connect
+  Local.
+- The notification queue overflow handler wrapped the wrong call:
+  `call_soon_threadsafe` was inside the `try`, but it never raises
+  `QueueFull` itself (it only schedules `put_nowait`, which runs later,
+  outside the `try`). A burst of notifications overflowing the queue
+  therefore surfaced as an unhandled "Error doing job" exception instead of
+  the intended clean debug log. Fixed by moving the `try`/`except` to where
+  `put_nowait` actually runs, matching the pattern already used by Blue
+  Connect Local.
 - Invalid BLE frames retried forever: `retry_count` was reset before the frame was decoded, so the
   retry budget never ran out and the "unreachable after retries" state was never reached.
 - CyA entered on the entity was reverted to the old options value whenever another setting
@@ -95,5 +89,18 @@
 
 ### Documentation
 - `README.md` / `README.fr.md`: chlorine removal explained, raw ORP, minimum Home Assistant version,
-  development section. `calibration_help.md`: raw ORP calibration, "Chlore / Redox Statut" label
-  corrected to "Redox Statut". `info.md`: unfounded "Machine Learning" claim removed.
+  development section.
+- `calibration_help.md` / `calibration_help.fr.md`: guide now split into English and French versions,
+  raw ORP calibration, "Chlore / Redox Statut" label corrected to "Redox Statut".
+- `CHANGELOG.md` / `CHANGELOG.fr.md`: added English and French changelog files.
+- `info.md`: unfounded "Machine Learning" claim removed.
+
+## 1.1.0
+
+### Added
+- Add support for Flipr Start Max.
+
+## 1.0.0
+
+### Added
+- Initial clean version (first stable release).

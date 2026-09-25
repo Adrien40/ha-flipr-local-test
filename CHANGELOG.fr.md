@@ -9,6 +9,12 @@
 ### Ajouté
 - Capteur de diagnostic **Redox Brut (mV)**, à côté du pH brut existant : la valeur de la sonde
   *avant* tout décalage, pour calibrer sur une solution étalon.
+- Les analyses planifiées sont désormais calées sur des créneaux fixes (intervalle + heure de référence),
+  sur le même principe que Blue Connect Local, au lieu d'un intervalle glissant.
+- Nouvelle entité **Heure de référence** pour définir l'ancrage de l'alignement (08:00 par défaut) ;
+  l'entité existante **Intervalle d'analyse** alimente désormais ce mécanisme au lieu d'écrire
+  directement dans l'intervalle de rafraîchissement du coordinateur. Les deux sont aussi configurables
+  depuis l'assistant d'installation et les options au sein d'une nouvelle section **Synchronisation**.
 
 ### Supprimé (changement cassant)
 - Capteurs **Chlore Libre Estimé** et **Chlore Actif (HOCl)**. Pourquoi :
@@ -40,6 +46,16 @@
   elle ne peut plus rester armée et contourner la pause plus tard.
 
 ### Corrigé
+- `start_notify`, `stop_notify`, `disconnect` et la lecture directe utilisée par « Flipr Start Max »
+  n'avaient aucun délai d'attente (*timeout*) : une pile BLE qui ne répondait plus après une connexion
+  réussie pouvait bloquer indéfiniment le cycle de mise à jour. Ces quatre opérations sont désormais
+  encadrées par la constante `TIMEOUT_GATT_OP` (10 s), à l'identique de Blue Connect Local.
+- La gestion du débordement de la file de notifications englobait le mauvais appel :
+  `call_soon_threadsafe` était dans le bloc `try`, or il ne lève jamais `QueueFull` directement (il se
+  contente de planifier `put_nowait`, exécuté plus tard hors du `try`). Un afflux de notifications
+  saturant la file générait donc une exception non gérée « Error doing job » au lieu du journal de
+  débogage attendu. Corrigé en déplaçant le bloc `try` / `except` là où `put_nowait` s'exécute réellement,
+  sur le modèle de Blue Connect Local.
 - Les trames BLE invalides étaient retentées indéfiniment : `retry_count` était remis à zéro avant
   le décodage de la trame, donc les tentatives ne s'épuisaient jamais et l'état « injoignable »
   n'était jamais atteint.
@@ -73,6 +89,18 @@
 
 ### Documentation
 - `README.md` / `README.fr.md` : suppression du chlore expliquée, Redox brut, version minimale de
-  Home Assistant, section développement. `calibration_help.md` : calibration du Redox brut, libellé
-  « Chlore / Redox Statut » corrigé en « Redox Statut ». `info.md` : mention infondée de « Machine
-  Learning » retirée.
+  Home Assistant, section développement.
+- `calibration_help.md` / `calibration_help.fr.md` : guide désormais scindé en versions Anglaise
+  et Française, calibration du Redox brut, libellé « Chlore / Redox Statut » corrigé en « Redox Statut ».
+- `CHANGELOG.md` / `CHANGELOG.fr.md` : mise en place des journaux de modifications en Anglais et en Français.
+- `info.md` : mention infondée de « Machine Learning » retirée.
+
+## 1.1.0
+
+### Ajouté
+- Prise en charge du modèle Flipr Start Max.
+
+## 1.0.0
+
+### Ajouté
+- Première version stable officielle de l'intégration.

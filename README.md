@@ -76,7 +76,7 @@ Flipr Local lets you replace the cloud with a **local control** solution, provid
 * 🛜 **Gateway-Free**: The gateway is not required, but keeping it allows you to maintain cloud access on the official mobile app!
 * 🧪 **Advanced Chemical Intelligence**:
   * **Langelier Saturation Index (LSI)** calculation to determine if the water is balanced, scaling, or corrosive.
-  * **Equilibrium pH** (Taylor balance) from temperature, TAC, TH and TDS.
+  * **Equilibrium pH** (Taylor Balance) from Temperature, TAC, TH and TDS.
 * 🟤 **Treatment type & stabilizer (CYA)**: you can record your treatment (Chlorine / Bromine) and your stabilizer level. These settings are kept for future use — **no calculated value depends on them at the moment**.
 * ⚙️ **100% UI Configuration**: Automatic Bluetooth discovery, probe calibration, and alert threshold setup directly from the Home Assistant interface (no YAML required).
 * 🔄 **Sync Modes**: Control the sync mode (Sleep, Eco, Normal, Boost) for users with the Wi-Fi gateway, preventing battery drain.
@@ -168,7 +168,6 @@ Enter your Alkalinity (TAC), Hardness (TH), and TDS in the options, and Home Ass
 
 </details>
 
-
 ### 🎯 A Note on Measurement Accuracy
 The values displayed in Home Assistant may differ slightly from the official Flipr app.
 
@@ -177,7 +176,7 @@ Flipr Local enables "high-precision" calibration. Unlike the mobile app, which u
 ---
 
 ## 🚀 Configuration
-> ⚠️ Requires **Home Assistant 2026.3.0 or newer** (the first release shipped with Python 3.14). Tested on 2026.3.0 and 2026.9.
+> ⚠️ Requires **Home Assistant 2026.3.0 or newer** (the first release shipped with Python 3.14). Tested on 2026.3.0 and 2026.9.3.
 
 1. Go to **Settings** > **Devices & Services**.
 2. The integration should automatically discover your Flipr if your Bluetooth adapter/antenna is in range.
@@ -224,7 +223,7 @@ automation:
         entity_id: binary_sensor.flipr_ph_status
         to: "on"
     action:
-      - service: notify.mobile_app_your_phone
+      - action: notify.mobile_app_your_phone
         data:
           title: "⚠️ Pool pH alert"
           message: "pH is currently {{ states('sensor.flipr_ph') }}, outside the configured range."
@@ -244,7 +243,7 @@ automation:
           action: create
           domain: flipr_local
     action:
-      - service: notify.mobile_app_your_phone
+      - action: notify.mobile_app_your_phone
         data:
           title: "🔌 Flipr unreachable"
           message: "The Flipr probe hasn't responded in a while. Check its battery and Bluetooth range."
@@ -259,7 +258,7 @@ automation:
 
 ---
 
-### 🛠️ Hardware Rescue:
+### 🛠️ Hardware Rescue
 
 <details>
 <summary>🔧 View the complete procedure</summary>
@@ -299,7 +298,7 @@ Project licensed under **GPLv3**. Independent from the Flipr company. Use entire
 
 ```bash
 pip install -r requirements_test.txt   # Python 3.14
-pytest --cov                            # ~380 tests, simulated Bluetooth (no hardware needed)
+pytest --cov                            # ~450 tests, simulated Bluetooth (no hardware needed)
 ruff check . && ruff format --check .
 ```
 

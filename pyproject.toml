@@ -26,7 +26,7 @@ filterwarnings = [
     # random.Random instance it sees (e.g. from pytest-homeassistant-custom-component
     # or a fixture), and that instance can be garbage-collected right after. Not
     # caused by this integration's code and doesn't affect test correctness.
-    "ignore:It looks like `register_random` was passed an object:UserWarning:hypothesis.*",
+    "ignore:It looks like `register_random` was passed an object:hypothesis.errors.HypothesisWarning",
 ]
 
 [tool.coverage.run]

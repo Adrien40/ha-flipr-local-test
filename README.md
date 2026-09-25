@@ -3,6 +3,12 @@
 # Flipr Local for Home Assistant 🐬
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub Release](https://img.shields.io/github/v/release/Adrien40/ha-flipr-local)](https://github.com/Adrien40/ha-flipr-local/releases)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/Adrien40/ha-flipr-local/blob/main/LICENSE)
+[![Tests](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local/tests.yml?branch=main&label=tests)](https://github.com/Adrien40/ha-flipr-local/actions/workflows/tests.yml)
+[![Validate](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local/validate.yml?branch=main&label=hassfest%2Fhacs)](https://github.com/Adrien40/ha-flipr-local/actions/workflows/validate.yml)
+[![Linting](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local/lint.yml?branch=main&label=lint)](https://github.com/Adrien40/ha-flipr-local/actions/workflows/lint.yml)
+[![CodeQL](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local/codeql.yml?branch=main&label=codeql)](https://github.com/Adrien40/ha-flipr-local/actions/workflows/codeql.yml)
+[![Quality Scale](https://img.shields.io/badge/HA%20Quality%20Scale-Silver-silver)](custom_components/flipr_local/quality_scale.yaml)
 
 If you find this project useful, you can support its development 🙏
 
@@ -189,6 +195,9 @@ Once the device is added, you can click on **Configure** ⚙️ to:
 * Modify your water parameters (TAC, TH, TDS, Stabilizer) via the dashboard.
 * Define your **custom alert thresholds** (Min/Max pH, Min/Max ORP, etc.) to trigger your own automations.
 
+> 📖 **Need help calibrating your probes?**  
+> Find the step-by-step procedure (official app method vs. raw mV values, temperature compensation, and alert thresholds) in the **[Calibration Guide](calibration_help.md)**.
+
 ---
 
 ### 🐛 Troubleshooting
@@ -291,15 +300,3 @@ Project licensed under **GPLv3**. Independent from the Flipr company. Use entire
 **Developed with ❤️ by @Adrien40**
 
 <a href="https://www.buymeacoffee.com/adrien40"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" width="180"></a>
-
----
-
-## 🧪 Development & tests
-
-```bash
-pip install -r requirements_test.txt   # Python 3.14
-pytest --cov                            # ~450 tests, simulated Bluetooth (no hardware needed)
-ruff check . && ruff format --check .
-```
-
-The BLE frame decoding (`frame.py`) and the maths (`chemistry.py`) are pure functions, tested without Home Assistant logic. The coordinator is tested against a fake GATT client (`tests/helpers.py`).

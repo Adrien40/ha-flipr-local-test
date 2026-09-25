@@ -1,4 +1,7 @@
-# 🎛️ Calibration Guide - Flipr Local
+[![Français](https://img.shields.io/badge/Langue-Fran%C3%A7ais-blue)](calibration_help.fr.md) [![English](https://img.shields.io/badge/Language-English-red)](#)
+[← Back to README](README.md)
+
+# 🎛️ Flipr Local - Calibration Guide
 
 This document explains how to configure and fine-tune your Flipr probe calibration directly from the Home Assistant interface. 💡
 

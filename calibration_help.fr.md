@@ -1,4 +1,7 @@
-# 🎛️ Guide de Calibration - Flipr Local
+[![English](https://img.shields.io/badge/Language-English-red)](calibration_help.md) [![Français](https://img.shields.io/badge/Langue-Fran%C3%A7ais-blue)](#)
+[← Retour au README](README.fr.md)
+
+# 🎛️ Flipr Local - Guide de Calibration
 
 Ce document explique comment configurer et affiner la calibration de votre sonde Flipr directement depuis l'interface de Home Assistant. 💡
 

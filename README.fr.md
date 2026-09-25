@@ -3,6 +3,14 @@
 # Flipr Local pour Home Assistant 🐬
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub Release](https://img.shields.io/github/v/release/Adrien40/ha-flipr-local)](https://github.com/Adrien40/ha-flipr-local/releases)
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+[![GitHub Release](https://img.shields.io/github/v/release/Adrien40/ha-flipr-local)](https://github.com/Adrien40/ha-flipr-local/releases)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/Adrien40/ha-flipr-local/blob/main/LICENSE)
+[![Tests](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local/tests.yml?branch=main&label=tests)](https://github.com/Adrien40/ha-flipr-local/actions/workflows/tests.yml)
+[![Validate](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local/validate.yml?branch=main&label=hassfest%2Fhacs)](https://github.com/Adrien40/ha-flipr-local/actions/workflows/validate.yml)
+[![Linting](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local/lint.yml?branch=main&label=lint)](https://github.com/Adrien40/ha-flipr-local/actions/workflows/lint.yml)
+[![CodeQL](https://img.shields.io/github/actions/workflow/status/Adrien40/ha-flipr-local/codeql.yml?branch=main&label=codeql)](https://github.com/Adrien40/ha-flipr-local/actions/workflows/codeql.yml)
+[![Quality Scale](https://img.shields.io/badge/HA%20Quality%20Scale-Silver-silver)](custom_components/flipr_local/quality_scale.yaml)
 
 Si ce projet vous est utile, vous pouvez soutenir son développement 🙏
 
@@ -189,6 +197,9 @@ Une fois l'appareil ajouté, vous pouvez cliquer sur **Configurer** ⚙️ pour 
 * Modifier les paramètres de votre eau (TAC, TH, TDS, Stabilisant) via le tableau de bord.
 * Définir vos **seuils d'alerte personnalisés** (pH Min/Max, ORP Min/Max, etc.) pour piloter vos propres automatisations.
 
+> 📖 **Besoin d'aide pour calibrer vos sondes ?**
+> Retrouvez la procédure pas à pas (méthode via l'application officielle ou en mV bruts, ajustement selon la température et seuils d'alerte) dans le **[Guide de Calibration](calibration_help.fr.md)**.
+
 ---
 
 ### 🐛 Dépannage
@@ -291,15 +302,3 @@ Projet sous licence **GPLv3**. Indépendant de la société Flipr. Utilisation s
 **Développé avec ❤️ par @Adrien40**
 
 <a href="https://www.buymeacoffee.com/adrien40"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" width="180"></a>
-
----
-
-## 🧪 Développement & tests
-
-```bash
-pip install -r requirements_test.txt   # Python 3.14
-pytest --cov                            # ~450 tests, Bluetooth simulé (aucun matériel requis)
-ruff check . && ruff format --check .
-```
-
-Le décodage des trames BLE (`frame.py`) et les calculs chimiques (`chemistry.py`) sont des fonctions pures, testées indépendamment de Home Assistant. Le coordinateur est validé contre un client GATT simulé (`tests/helpers.py`).

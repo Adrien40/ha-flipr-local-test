@@ -76,12 +76,12 @@ Flipr Local permet de remplacer le cloud par une solution de **local control**, 
 * 🛜 **Sans Passerelle** : La passerelle n'est pas nécessaire, mais elle permet de conserver le Cloud sur l'application mobile officielle !
 * 🧪 **Intelligence Chimique Avancée** :
   * Calcul de l'**Indice de Langelier** (ISL) pour déterminer si l'eau est équilibrée, entartrante ou corrosive.
-  * **pH d'équilibre** (balance de Taylor) calculé depuis la température, le TAC, le TH et le TDS.
-* 🟤 **Type de traitement et stabilisant (CYA)** : vous pouvez renseigner votre traitement (Chlore / Brome) et votre taux de stabilisant. Ces réglages sont conservés pour un usage futur — **aucune valeur calculée n'en dépend pour le moment**.
+  * **pH d'équilibre** (Balance de Taylor) calculé depuis la Température, le TAC, le TH et le TDS.
+* 🟤 **Type de Traitement et Stabilisant (CYA)** : vous pouvez renseigner votre traitement (Chlore / Brome) et votre taux de stabilisant. Ces réglages sont conservés pour un usage futur — **aucune valeur calculée n'en dépend pour le moment**.
 * ⚙️ **Configuration 100% UI** : Découverte automatique Bluetooth, calibrage des sondes et réglage des seuils d'alerte directement depuis l'interface Home Assistant (aucun YAML requis).
 * 🔄 **Modes de Synchronisation** : Contrôle du mode de synchronisation (Sommeil, Éco, Normal, Boost) pour les utilisateurs possédant la passerelle Wi-Fi, afin d'éviter de vider la batterie.
 * 🌍 **Multi-langue** : Développé en Français 🇫🇷 et disponible en EN, ES, DE, IT, NL, PL, PT, PT-BR, SV, RU, ZH-HANS, ZH-HANT, CS, HU, EL, HR, DA, NB (Traduction via IA).
-* 📡 Transforme votre Flipr en véritable **BLE sensor** pour Home Assistant
+* 📡 Transforme votre Flipr en véritable **BLE sensor** pour Home Assistant.
 
 ---
 
@@ -100,6 +100,13 @@ Ce dépôt n'étant pas (encore) dans la liste officielle par défaut, vous deve
 
 ### Manuelle
 Copiez le dossier `custom_components/flipr_local` dans le dossier `custom_components` de votre configuration Home Assistant, puis redémarrez.
+
+### 🗑️ Suppression
+1. Allez dans **Paramètres** > **Appareils et services**, sélectionnez votre appareil Flipr, cliquez sur les 3 points et choisissez **Supprimer**. Cela supprime toutes les entités et interrompt la scrutation Bluetooth.
+2. Si installé via HACS : ouvrez **HACS**, trouvez **Flipr Local**, cliquez sur les 3 points et sélectionnez **Supprimer**.
+3. Si installé manuellement : supprimez le dossier `custom_components/flipr_local`, puis redémarrez Home Assistant.
+
+Supprimer l'intégration efface également son historique local (dernières valeurs connues, points de référence de calibration). Si vous souhaitez simplement suspendre les mesures sans perdre ces données, désactivez plutôt l'interrupteur **Analyses Auto.**.
 
 ---
 
@@ -161,7 +168,6 @@ Renseignez votre TAC, TH et TDS dans les options, et Home Assistant calculera vo
 
 </details>
 
-
 ### 🎯 Note sur la précision des mesures
 Les valeurs affichées dans Home Assistant peuvent différer légèrement de celles de l'application officielle Flipr.
 
@@ -170,12 +176,12 @@ Flipr Local permet une calibration "haute précision". Contrairement à l'applic
 ---
 
 ## 🚀 Configuration
-> ⚠️ Nécessite **Home Assistant 2026.3.0 ou plus récent** (première version livrée avec Python 3.14). Testé sur 2026.3.0 et 2026.9.
+> ⚠️ Nécessite **Home Assistant 2026.3.0 ou plus récent** (première version livrée avec Python 3.14). Testé sur 2026.3.0 et 2026.9.3.
 
 1. Allez dans **Paramètres** > **Appareils et services**.
 2. L'intégration devrait détecter automatiquement votre Flipr si votre clé/antenne Bluetooth est à portée.
-2. Cliquez sur **Ajouter une intégration** et recherchez **Flipr Local**.
-3. Suivez les instructions à l'écran pour définir le type de traitement (Chlore, Brome), le taux de stabilisant et le calibrage/décalage de vos sondes.
+3. Cliquez sur **Ajouter une intégration** et recherchez **Flipr Local**.
+4. Suivez les instructions à l'écran pour définir le type de Traitement (Chlore, Brome), le taux de Stabilisant et le calibrage/décalage de vos sondes.
 
 ### ⚙️ Options, Calibrations et Alertes
 Une fois l'appareil ajouté, vous pouvez cliquer sur **Configurer** ⚙️ pour :
@@ -198,7 +204,61 @@ Une fois l'appareil ajouté, vous pouvez cliquer sur **Configurer** ⚙️ pour 
 
 ---
 
-### 🛠️ Sauvetage Matériel :
+### 🎯 Cas d'usage
+* **Automatisation de la sécurité du bassin** : déclenchez une notification ou coupez la filtration si le pH ou le Redox sort de votre plage de sécurité grâce aux capteurs binaires `pH Statut` et `Redox Statut`.
+* **Protection contre le gel** : associez le capteur `Température Statut` à la mise en route forcée de la pompe ou d'un volet dès que l'eau approche de 0°C l'hiver.
+* **Rappels de traitement chimique** : surveillez le statut de l'Indice de Langelier pour être alerté dès que l'eau devient corrosive ou entartrante, avant d'endommager vos équipements.
+* **Maintenance préventive de la batterie** : recevez une alerte de batterie faible bien avant l'arrêt complet de la sonde.
+
+### 🤖 Exemples d'automatisations
+
+<details>
+<summary>📋 Notification en cas de pH anormal</summary>
+
+```yaml
+automation:
+  - alias: "Piscine : pH hors plage"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.flipr_ph_status
+        to: "on"
+    action:
+      - action: notify.mobile_app_votre_telephone
+        data:
+          title: "⚠️ Alerte pH Piscine"
+          message: "Le pH est actuellement à {{ states('sensor.flipr_ph') }}, en dehors des limites configurées."
+```
+</details>
+
+<details>
+<summary>📋 Alerte si la sonde ne répond plus</summary>
+
+```yaml
+automation:
+  - alias: "Flipr inaccessible"
+    trigger:
+      - platform: event
+        event_type: repairs_issue_registry_updated
+        event_data:
+          action: create
+          domain: flipr_local
+    action:
+      - action: notify.mobile_app_votre_telephone
+        data:
+          title: "🔌 Flipr injoignable"
+          message: "La sonde Flipr ne répond plus depuis un moment. Vérifiez la batterie et la portée Bluetooth."
+```
+</details>
+
+### ⚠️ Limitations connues
+* **Portée Bluetooth** : comme tout équipement BLE, le Flipr doit rester à portée d'un adaptateur Bluetooth ou d'un proxy ESPHome. Les abris fermés, les volets roulants, la distance et les structures métalliques peuvent affaiblir le signal.
+* **Pas de notifications instantanées de la sonde** : les données sont relevées selon l'intervalle planifié (ou à la demande via le bouton « Nouvelle analyse ») ; il ne s'agit pas d'un flux continu.
+* **Le Redox n'est pas une mesure de concentration de chlore** : utilisez la valeur Redox avec vos propres seuils et un test manuel (bandelettes/photomètre) pour vérifier votre concentration réelle.
+* **Une seule sonde par entrée de configuration** : si vous possédez plusieurs sondes Flipr, ajoutez chacune via une entrée dédiée.
+
+---
+
+### 🛠️ Sauvetage Matériel
 
 <details>
 <summary>🔧 Voir la procédure complète</summary>
@@ -210,7 +270,7 @@ Si les sondes de votre Flipr sont HS, vous pouvez les remplacer vous-même !
 2. Deux câbles adaptateurs (**Pigtails**) : `MMCX Mâle coudé (90°) vers BNC Femelle`. *Le connecteur coudé est indispensable pour pouvoir refermer le capot du Flipr.*
 
 **Procédure rapide :**
-Retirez les anciennes sondes, nettoyez la base blanche. Branchez les adaptateurs MmCX sur la carte mère (Ports `PH` et `ORP`). Passez les nouvelles sondes dans les trous d'origine (12 mm), connectez-les aux câbles BNC. Calibrez via Home Assistant, et c'est reparti !
+Retirez les anciennes sondes, nettoyez la base blanche. Branchez les adaptateurs MMCX sur la carte mère (Ports `PH` et `ORP`). Passez les nouvelles sondes dans les trous d'origine (12 mm), connectez-les aux câbles BNC. Calibrez via Home Assistant, et c'est reparti !
 
 </details>
 
@@ -232,4 +292,14 @@ Projet sous licence **GPLv3**. Indépendant de la société Flipr. Utilisation s
 
 <a href="https://www.buymeacoffee.com/adrien40"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" width="180"></a>
 
-<!-- Keywords: Home Assistant custom integration, BLE sensor, pool monitoring, local control -->
+---
+
+## 🧪 Développement & tests
+
+```bash
+pip install -r requirements_test.txt   # Python 3.14
+pytest --cov                            # ~450 tests, Bluetooth simulé (aucun matériel requis)
+ruff check . && ruff format --check .
+```
+
+Le décodage des trames BLE (`frame.py`) et les calculs chimiques (`chemistry.py`) sont des fonctions pures, testées indépendamment de Home Assistant. Le coordinateur est validé contre un client GATT simulé (`tests/helpers.py`).

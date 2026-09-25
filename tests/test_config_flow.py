@@ -6,10 +6,15 @@ from time import monotonic
 from unittest.mock import patch
 
 import pytest
+import voluptuous as vol
 from bleak.backends.device import BLEDevice
 from bleak.backends.scanner import AdvertisementData
 from homeassistant.components.bluetooth import BluetoothServiceInfoBleak
-from homeassistant.config_entries import SOURCE_BLUETOOTH, SOURCE_USER
+from homeassistant.config_entries import (
+    SOURCE_BLUETOOTH,
+    SOURCE_RECONFIGURE,
+    SOURCE_USER,
+)
 from homeassistant.data_entry_flow import FlowResultType
 
 from custom_components.flipr_local.const import (
@@ -521,3 +526,86 @@ async def test_high_sync_mode_without_gateway_skips_warning(hass):
         _options_input(general={CONF_USE_GATEWAY: False, CONF_SYNC_MODE: "3"}),
     )
     assert result["type"] is FlowResultType.CREATE_ENTRY
+
+
+# ---------------------------------------------------------------------------
+# Reconfigure flow (point this entry at a different physical Flipr)
+# ---------------------------------------------------------------------------
+NEW_MAC = "11:22:33:44:55:66"
+
+
+async def _start_reconfigure(hass, entry):
+    return await hass.config_entries.flow.async_init(
+        DOMAIN,
+        context={"source": SOURCE_RECONFIGURE, "entry_id": entry.entry_id},
+    )
+
+
+async def test_reconfigure_form_prefills_current_mac(hass, coordinator, entry):
+    with patch(DISCOVERED, return_value=[]):
+        result = await _start_reconfigure(hass, entry)
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "reconfigure"
+    schema_defaults = {
+        field.schema: field.default()
+        for field in result["data_schema"].schema
+        if field.default is not vol.UNDEFINED
+    }
+    assert schema_defaults[CONF_MAC_ADDRESS] == MAC
+
+
+async def test_reconfigure_updates_mac(hass, coordinator, entry):
+    with patch(DISCOVERED, return_value=[]):
+        result = await _start_reconfigure(hass, entry)
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {CONF_MAC_ADDRESS: NEW_MAC}
+        )
+        await hass.async_block_till_done()
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+    assert entry.data[CONF_MAC_ADDRESS] == NEW_MAC
+    assert entry.unique_id == NEW_MAC
+
+
+async def test_reconfigure_rejects_invalid_mac(hass, coordinator, entry):
+    with patch(DISCOVERED, return_value=[]):
+        result = await _start_reconfigure(hass, entry)
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {CONF_MAC_ADDRESS: "not-a-mac"}
+        )
+    assert result["errors"] == {CONF_MAC_ADDRESS: "invalid_mac"}
+    assert entry.data[CONF_MAC_ADDRESS] == MAC
+
+
+async def test_reconfigure_can_keep_the_same_mac(hass, coordinator, entry):
+    """Re-running the flow without actually changing the device."""
+    with patch(DISCOVERED, return_value=[]):
+        result = await _start_reconfigure(hass, entry)
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {CONF_MAC_ADDRESS: MAC}
+        )
+        await hass.async_block_till_done()
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+    assert entry.data[CONF_MAC_ADDRESS] == MAC
+
+
+async def test_reconfigure_aborts_if_mac_used_by_another_entry(
+    hass, coordinator, entry
+):
+    other_mac = "AA:AA:AA:AA:AA:AA"
+    other_entry = make_entry()
+    other_entry.add_to_hass(hass)
+    hass.config_entries.async_update_entry(other_entry, unique_id=other_mac)
+
+    with patch(DISCOVERED, return_value=[]):
+        result = await _start_reconfigure(hass, entry)
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {CONF_MAC_ADDRESS: other_mac}
+        )
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "already_configured"
+    assert entry.data[CONF_MAC_ADDRESS] == MAC

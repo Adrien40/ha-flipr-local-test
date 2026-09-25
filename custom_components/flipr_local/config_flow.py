@@ -347,6 +347,53 @@ class FliprConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
+    async def async_step_reconfigure(
+        self, user_input=None
+    ) -> config_entries.FlowResult:
+        """Point this entry at a different physical Flipr (e.g. after
+        replacing the device), without losing its options, automations,
+        or entity history. Only the MAC address changes; everything else
+        (calibration, thresholds, sync mode) is kept as-is.
+        """
+        errors: dict[str, str] = {}
+        reconfigure_entry = self._get_reconfigure_entry()
+
+        if user_input is not None:
+            mac_raw = user_input[CONF_MAC_ADDRESS].strip()
+            if not MAC_PATTERN.match(mac_raw):
+                errors[CONF_MAC_ADDRESS] = "invalid_mac"
+            else:
+                final_mac = mac_raw.upper()
+                if final_mac != reconfigure_entry.data.get(CONF_MAC_ADDRESS):
+                    await self.async_set_unique_id(final_mac)
+                    self._abort_if_unique_id_configured()
+
+                bt_name = None
+                for info in async_discovered_service_info(self.hass, False):
+                    if info.address.upper() == final_mac and info.name:
+                        bt_name = info.name
+                        break
+                model = get_flipr_model(bt_name)
+
+                return self.async_update_reload_and_abort(
+                    reconfigure_entry,
+                    unique_id=final_mac,
+                    data_updates={CONF_MAC_ADDRESS: final_mac, "model": model},
+                )
+
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_MAC_ADDRESS,
+                        default=reconfigure_entry.data.get(CONF_MAC_ADDRESS, ""),
+                    ): str
+                }
+            ),
+            errors=errors,
+        )
+
     @staticmethod
     @callback
     def async_get_options_flow(config_entry):

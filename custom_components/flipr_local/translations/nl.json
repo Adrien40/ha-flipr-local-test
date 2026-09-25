@@ -24,7 +24,7 @@
               "reference_time": "🕒 Referentietijd (planning)"
             },
             "data_description": {
-              "reference_time": "Referentietijd gebruikt om geplande analyses af te stemmen op regelmatige intervallen (bijv. 08:00, 09:00, 10:00... voor een interval van 1 uur)."
+              "reference_time": "Referentietijd gebruikt om geplande analyses af te stemmen op regelmatige intervallen (bijv. 08:00, 10:00, 12:00... voor een interval van 2 uur)."
             }
           },
           "probes_calibration": {
@@ -50,6 +50,13 @@
         "description": "Voer het Bluetooth MAC-adres in (bijv. AA:BB:CC:DD:EE:FF)",
         "data": {
           "mac_address": "🏷️ Bluetooth MAC-adres"
+        }
+      },
+      "reconfigure": {
+        "title": "Flipr-apparaat bijwerken",
+        "description": "Koppel deze invoer aan een andere fysieke Flipr (bijv. na vervanging van het apparaat). Uw opties, automatiseringen en entiteitsgeschiedenis blijven behouden.",
+        "data": {
+          "mac_address": "✍️ Bluetooth MAC-adres"
         }
       }
     },
@@ -95,7 +102,7 @@
               "reference_time": "🕒 Referentietijd (planning)"
             },
             "data_description": {
-              "reference_time": "Referentietijd gebruikt om geplande analyses af te stemmen op regelmatige intervallen (bijv. 08:00, 09:00, 10:00... voor een interval van 1 uur)."
+              "reference_time": "Referentietijd gebruikt om geplande analyses af te stemmen op regelmatige intervallen (bijv. 08:00, 10:00, 12:00... voor een interval van 2 uur)."
             }
           },
           "probes_calibration": {
@@ -303,6 +310,23 @@
     "device_unreachable": {
       "title": "Flipr onbereikbaar",
       "description": "De Flipr-sonde ({name}) heeft {days} dag(en) niet gereageerd. Controleer de voeding, het bereik, en of een Bluetooth-adapter of ESPHome-proxy het zwembadgebied dekt."
+    }
+  },
+  "exceptions": {
+    "out_of_range_no_history": {
+      "message": "Flipr {mac} bevindt zich buiten het Bluetooth-bereik en er zijn geen eerdere gegevens beschikbaar."
+    },
+    "device_not_found": {
+      "message": "Het Bluetooth-apparaat voor Flipr {mac} kon niet worden gevonden ondanks een recent signaal."
+    },
+    "entry_not_available": {
+      "message": "De configuratie-invoer is niet meer beschikbaar."
+    },
+    "connection_timeout_no_history": {
+      "message": "Flipr {mac} kon niet worden bereikt na {timeout} seconden en er zijn geen gegevens beschikbaar."
+    },
+    "unreachable_no_history": {
+      "message": "Flipr is onbereikbaar en er zijn geen eerdere gegevens beschikbaar: {error}"
     }
   }
 }

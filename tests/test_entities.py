@@ -18,6 +18,7 @@ from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
+from custom_components.flipr_local.binary_sensor import FliprAlertSensor
 from custom_components.flipr_local.const import (
     BT_STATUS_OUT_OF_RANGE,
     BT_STATUS_PAUSED,
@@ -30,6 +31,7 @@ from custom_components.flipr_local.const import (
     CONF_REFERENCE_TIME,
     CONF_SCAN_INTERVAL,
     CONF_TEMP_MAX,
+    DEFAULT_PH_MAX,
 )
 
 from .conftest import entity_id, make_entry
@@ -83,9 +85,58 @@ async def test_next_analysis_hidden_when_paused(hass, coordinator):
     )
 
 
+async def test_next_analysis_unknown_when_no_slot_scheduled(hass, coordinator):
+    coordinator.next_slot = None
+    coordinator.async_set_updated_data(dict(coordinator.data))
+    await hass.async_block_till_done()
+    assert (
+        hass.states.get(entity_id(hass, "sensor", "next_analysis")).state
+        == STATE_UNKNOWN
+    )
+
+
+async def test_next_analysis_converts_naive_slot_to_utc(hass, coordinator):
+    """next_slot is normally tz-aware; a naive value must still be handled."""
+    naive = dt_util.utcnow().replace(tzinfo=None)
+    coordinator.next_slot = naive
+    coordinator.async_set_updated_data(dict(coordinator.data))
+    await hass.async_block_till_done()
+    state = hass.states.get(entity_id(hass, "sensor", "next_analysis"))
+    assert dt_util.parse_datetime(state.state) == dt_util.as_utc(naive).replace(
+        microsecond=0
+    )
+
+
 async def test_rssi_sensor_follows_advertisements(hass, coordinator, ble):
     state = hass.states.get(entity_id(hass, "sensor", "rssi"))
     assert state.state == str(ble.rssi)
+
+
+async def test_sensors_fall_back_to_unknown_with_no_coordinator_data(hass, coordinator):
+    """Covers the `if not self.coordinator.data` guard in every sensor class.
+
+    Unlike update_volatile_state/update_local_state (which merge into existing
+    data), this replaces coordinator.data with a genuinely empty dict, as could
+    happen very early during setup before the first successful cycle.
+    """
+    coordinator.async_set_updated_data({})
+    await hass.async_block_till_done()
+    assert hass.states.get(entity_id(hass, "sensor", "temperature")).state == (
+        STATE_UNKNOWN
+    )
+    assert hass.states.get(entity_id(hass, "sensor", "sync_mode")).state == (
+        STATE_UNKNOWN
+    )
+    assert (
+        hass.states.get(entity_id(hass, "sensor", "bluetooth_status")).state
+        == BT_STATUS_WAITING
+    )
+    assert hass.states.get(entity_id(hass, "sensor", "next_analysis")).state == (
+        STATE_UNKNOWN
+    )
+    assert hass.states.get(entity_id(hass, "binary_sensor", "ph_status")).state == (
+        STATE_UNKNOWN
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -94,6 +145,40 @@ async def test_rssi_sensor_follows_advertisements(hass, coordinator, ble):
 @pytest.mark.parametrize("key", ["ph_status", "orp_status", "temperature_status"])
 async def test_alerts_off_when_values_in_range(hass, coordinator, key):
     assert hass.states.get(entity_id(hass, "binary_sensor", key)).state == STATE_OFF
+
+
+async def test_alert_is_on_returns_none_for_unknown_data_key(hass, coordinator):
+    """Defensive fallback: only ph/orp/temperature are meaningful data_keys."""
+    sensor = FliprAlertSensor(
+        coordinator,
+        "fake_entry_id",
+        coordinator.mac,
+        "Flipr",
+        "battery_status",
+        "battery",
+    )
+    assert sensor.is_on is None
+
+
+async def test_alert_keeps_default_thresholds_when_entry_is_gone(hass, coordinator):
+    """_refresh_cached_thresholds must not crash if the config entry vanished."""
+    sensor = FliprAlertSensor(
+        coordinator, "fake_entry_id", coordinator.mac, "Flipr", "ph_status", "ph"
+    )
+    sensor.hass = hass
+    original_async_get_entry = hass.config_entries.async_get_entry
+    # Only fake it away for our made-up entry_id: replacing the bound method
+    # outright would also break Home Assistant's own entry-unload machinery
+    # during fixture teardown (it uses the same method internally), leaving a
+    # lingering background task and failing every test that runs afterwards.
+    hass.config_entries.async_get_entry = lambda entry_id: (
+        None if entry_id == "fake_entry_id" else original_async_get_entry(entry_id)
+    )
+    try:
+        sensor._refresh_cached_thresholds()
+        assert sensor._cached_thresholds[CONF_PH_MAX] == DEFAULT_PH_MAX
+    finally:
+        hass.config_entries.async_get_entry = original_async_get_entry
 
 
 async def test_ph_alert_follows_threshold_options(hass, coordinator, entry):
@@ -270,7 +355,8 @@ async def test_switch_pauses_measurements(hass, coordinator):
     assert coordinator.data["bluetooth_status"] == BT_STATUS_PAUSED
 
 
-async def test_switch_resume_requests_refresh(hass, coordinator):
+async def test_switch_resume_does_not_request_refresh(hass, coordinator):
+    """Like Blue Connect: turning the switch back on must not trigger an immediate analysis."""
     switch = entity_id(hass, "switch", "active_measures")
     await _call(hass, "switch", "turn_off", switch)
     coordinator.async_request_refresh = AsyncMock()
@@ -278,7 +364,7 @@ async def test_switch_resume_requests_refresh(hass, coordinator):
     await hass.async_block_till_done(wait_background_tasks=True)
     assert coordinator.data["active_measures"] is True
     assert coordinator.data["bluetooth_status"] == BT_STATUS_WAITING
-    coordinator.async_request_refresh.assert_awaited_once()
+    coordinator.async_request_refresh.assert_not_awaited()
 
 
 async def test_switch_resume_without_bluetooth_does_not_refresh(hass, coordinator, ble):
@@ -329,6 +415,48 @@ async def test_button_swallows_refresh_errors(hass, coordinator):
     await _call(hass, "button", "press", entity_id(hass, "button", "force_analysis"))
     await hass.async_block_till_done(wait_background_tasks=True)
     assert coordinator.data["action_running"] is False
+
+
+async def test_button_ignored_while_shutting_down(hass, coordinator):
+    """A press during shutdown must be a no-op, not raise or schedule anything."""
+    coordinator.async_request_refresh = AsyncMock()
+    coordinator._is_shutdown = True
+    try:
+        await _call(
+            hass, "button", "press", entity_id(hass, "button", "force_analysis")
+        )
+        await hass.async_block_till_done(wait_background_tasks=True)
+        coordinator.async_request_refresh.assert_not_awaited()
+    finally:
+        # Restore normal state so the `coordinator`/`setup_integration` fixture
+        # can unload the entry cleanly at the end of the test.
+        coordinator._is_shutdown = False
+
+
+async def test_button_logs_timeout_without_leaving_action_running(hass, coordinator):
+    """A refresh that exceeds TIMEOUT_FORCE_REFRESH is logged, not raised."""
+    coordinator.async_request_refresh = AsyncMock(side_effect=TimeoutError())
+    await _call(hass, "button", "press", entity_id(hass, "button", "force_analysis"))
+    await hass.async_block_till_done(wait_background_tasks=True)
+    assert coordinator.data["action_running"] is False
+
+
+async def test_button_does_not_schedule_task_when_entry_is_gone(hass, coordinator):
+    """If the config entry disappeared mid-press, no background task is scheduled."""
+    coordinator.async_request_refresh = AsyncMock()
+    original_async_get_entry = hass.config_entries.async_get_entry
+    hass.config_entries.async_get_entry = lambda entry_id: None
+    try:
+        await _call(
+            hass, "button", "press", entity_id(hass, "button", "force_analysis")
+        )
+        await hass.async_block_till_done(wait_background_tasks=True)
+        coordinator.async_request_refresh.assert_not_awaited()
+    finally:
+        # Restore before returning: Home Assistant's own entry-unload
+        # machinery (run by the `coordinator` fixture's teardown, right
+        # after this test function returns) relies on this same method.
+        hass.config_entries.async_get_entry = original_async_get_entry
 
 
 async def test_raw_orp_is_not_affected_by_calibration_offset(hass, setup_integration):

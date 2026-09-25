@@ -21,6 +21,10 @@ from .model import get_flipr_model
 _LOGGER = logging.getLogger(__name__)
 
 
+# Single Bluetooth connection to the device: commands must be serialized.
+PARALLEL_UPDATES = 1
+
+
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
@@ -35,7 +39,6 @@ async def async_setup_entry(
 class FliprReferenceTime(CoordinatorEntity, TimeEntity):
     _attr_has_entity_name = True
     _attr_translation_key = "reference_time"
-    _attr_icon = "mdi:clock-outline"
     _attr_entity_category = EntityCategory.CONFIG
 
     def __init__(self, coordinator, mac: str, model_name: str, entry_id: str) -> None:

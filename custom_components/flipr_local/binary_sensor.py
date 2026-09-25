@@ -41,6 +41,10 @@ _DEFAULT_THRESHOLDS: dict[str, float] = {
 }
 
 
+# Coordinator centralizes updates; entities are read-only.
+PARALLEL_UPDATES = 0
+
+
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:

@@ -27,6 +27,10 @@ from .model import get_flipr_model
 _LOGGER = logging.getLogger(__name__)
 
 
+# Single Bluetooth connection to the device: commands must be serialized.
+PARALLEL_UPDATES = 1
+
+
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
@@ -46,7 +50,6 @@ async def async_setup_entry(
                 500,
                 1,
                 0,
-                "mdi:water-percent",
                 entry_id,
                 model_name,
                 "mg/L",
@@ -59,7 +62,6 @@ async def async_setup_entry(
                 5000,
                 1,
                 0,
-                "mdi:blur",
                 entry_id,
                 model_name,
                 "ppm",
@@ -72,7 +74,6 @@ async def async_setup_entry(
                 800,
                 1,
                 0,
-                "mdi:water-outline",
                 entry_id,
                 model_name,
                 "mg/L",
@@ -85,7 +86,6 @@ async def async_setup_entry(
                 150,
                 1,
                 0,
-                "mdi:shield-sun",
                 entry_id,
                 model_name,
                 "mg/L",
@@ -108,7 +108,6 @@ class FliprUpdateIntervalNumber(CoordinatorEntity, RestoreNumber):
         self._attr_native_step = 1
         self._attr_native_unit_of_measurement = "min"
         self._attr_entity_category = EntityCategory.CONFIG
-        self._attr_icon = "mdi:sync"
         self._attr_mode = "box"
         self._attr_device_info = flipr_device_info(mac, model_name)
 
@@ -158,7 +157,6 @@ class FliprWaterConfigNumber(CoordinatorEntity, RestoreNumber):
         max_val: float,
         step: float,
         default_val: float,
-        icon: str,
         entry_id: str,
         model_name: str,
         unit: str,
@@ -173,7 +171,6 @@ class FliprWaterConfigNumber(CoordinatorEntity, RestoreNumber):
         self._attr_native_max_value = max_val
         self._attr_native_step = step
         self._attr_native_unit_of_measurement = unit
-        self._attr_icon = icon
         self._default_val = default_val
         self._attr_mode = "box"
         self._attr_entity_category = EntityCategory.CONFIG

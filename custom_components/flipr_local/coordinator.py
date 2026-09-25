@@ -626,7 +626,9 @@ class FliprDataCoordinator(DataUpdateCoordinator):
             if self.data.get("ph_raw") is not None:
                 return dict(self.data)
             raise UpdateFailed(
-                f"Flipr {self.safe_mac} out of range and no history available"
+                translation_domain=DOMAIN,
+                translation_key="out_of_range_no_history",
+                translation_placeholders={"mac": self.safe_mac},
             )
 
         device = async_ble_device_from_address(self.hass, self.mac, connectable=True)
@@ -644,7 +646,9 @@ class FliprDataCoordinator(DataUpdateCoordinator):
             if self.data.get("ph_raw") is not None:
                 return dict(self.data)
             raise UpdateFailed(
-                f"Flipr {self.safe_mac}: Bluetooth device not found despite recent signal"
+                translation_domain=DOMAIN,
+                translation_key="device_not_found",
+                translation_placeholders={"mac": self.safe_mac},
             )
 
         if force_one_shot:
@@ -652,7 +656,10 @@ class FliprDataCoordinator(DataUpdateCoordinator):
 
         current_entry = self.entry
         if not current_entry:
-            raise UpdateFailed("Config entry no longer available")
+            raise UpdateFailed(
+                translation_domain=DOMAIN,
+                translation_key="entry_not_available",
+            )
 
         is_init_done = self._init_done
         use_gw = get_opt(current_entry, CONF_USE_GATEWAY, True)
@@ -918,7 +925,12 @@ class FliprDataCoordinator(DataUpdateCoordinator):
                     if self.data.get("ph_raw") is not None:
                         return dict(self.data)
                     raise UpdateFailed(
-                        f"Flipr {self.safe_mac} unreachable after {TIMEOUT_BLE_CONN}s and no advertisement"
+                        translation_domain=DOMAIN,
+                        translation_key="connection_timeout_no_history",
+                        translation_placeholders={
+                            "mac": self.safe_mac,
+                            "timeout": str(TIMEOUT_BLE_CONN),
+                        },
                     ) from None
             except Exception as err:
                 return self._handle_ble_error(
@@ -1047,4 +1059,8 @@ class FliprDataCoordinator(DataUpdateCoordinator):
 
         if self.data.get("ph_raw") is not None:
             return dict(self.data)
-        raise UpdateFailed(f"Flipr unreachable and no history: {error_msg}")
+        raise UpdateFailed(
+            translation_domain=DOMAIN,
+            translation_key="unreachable_no_history",
+            translation_placeholders={"error": error_msg},
+        )

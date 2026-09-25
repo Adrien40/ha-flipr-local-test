@@ -24,7 +24,7 @@
               "reference_time": "🕒 Referentno vrijeme (raspored)"
             },
             "data_description": {
-              "reference_time": "Referentno vrijeme za usklađivanje planiranih analiza s redovitim intervalima (npr. 08:00, 09:00, 10:00... za 1-satni interval)."
+              "reference_time": "Referentno vrijeme za usklađivanje planiranih analiza s redovitim intervalima (npr. 08:00, 10:00, 12:00... za 2-satni interval)."
             }
           },
           "probes_calibration": {
@@ -50,6 +50,13 @@
         "description": "Unesite Bluetooth MAC adresu (npr. AA:BB:CC:DD:EE:FF)",
         "data": {
           "mac_address": "🏷️ Bluetooth MAC adresa"
+        }
+      },
+      "reconfigure": {
+        "title": "Ažuriraj Flipr uređaj",
+        "description": "Povežite ovaj unos s drugim fizičkim Fliprom (npr. nakon zamjene uređaja). Vaše opcije, automatizacije i povijest entiteta ostaju sačuvani.",
+        "data": {
+          "mac_address": "✍️ Bluetooth MAC adresa"
         }
       }
     },
@@ -95,7 +102,7 @@
               "reference_time": "🕒 Referentno vrijeme (raspored)"
             },
             "data_description": {
-              "reference_time": "Referentno vrijeme za usklađivanje planiranih analiza s redovitim intervalima (npr. 08:00, 09:00, 10:00... za 1-satni interval)."
+              "reference_time": "Referentno vrijeme za usklađivanje planiranih analiza s redovitim intervalima (npr. 08:00, 10:00, 12:00... za 2-satni interval)."
             }
           },
           "probes_calibration": {
@@ -303,6 +310,23 @@
     "device_unreachable": {
       "title": "Flipr nedostupan",
       "description": "Flipr sonda ({name}) nije odgovorila {days} dan(a). Provjerite napajanje, domet i pokriva li Bluetooth adapter ili ESPHome proxy područje bazena."
+    }
+  },
+  "exceptions": {
+    "out_of_range_no_history": {
+      "message": "Flipr {mac} je izvan Bluetooth dometa i nema dostupnih prethodnih podataka."
+    },
+    "device_not_found": {
+      "message": "Bluetooth uređaj za Flipr {mac} nije pronađen unatoč nedavnom signalu."
+    },
+    "entry_not_available": {
+      "message": "Unos konfiguracije više nije dostupan."
+    },
+    "connection_timeout_no_history": {
+      "message": "Flipr {mac} nije bilo moguće kontaktirati nakon {timeout} sekundi i nema dostupnih podataka."
+    },
+    "unreachable_no_history": {
+      "message": "Flipr je nedostupan i nema dostupnih prethodnih podataka: {error}"
     }
   }
 }

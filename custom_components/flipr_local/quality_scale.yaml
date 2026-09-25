@@ -57,17 +57,13 @@ rules:
   entity-unavailable: done
   integration-owner: done
   log-when-unavailable: done
-  parallel-updates:
-    status: todo
-    comment: PARALLEL_UPDATES is not declared in any platform module.
+  parallel-updates: done
   reauthentication-flow:
     status: exempt
     comment: >-
       Flipr has no access code / authentication concept; there is nothing to
       re-authenticate.
-  test-coverage:
-    status: todo
-    comment: "Measured at 93% (pytest-cov), just below the 95% threshold."
+  test-coverage: done
 
   # Gold
   devices: done
@@ -94,27 +90,25 @@ rules:
       No entity is currently disabled by default, unlike Blue Connect Local
       (conductivity/salinity on unsupported hardware variants).
   entity-translations: done
-  exception-translations:
-    status: todo
-    comment: Raised exceptions do not carry translation_key/translation_placeholders.
-  icon-translations:
-    status: todo
-    comment: No icons.json file.
-  reconfiguration-flow:
-    status: todo
-    comment: No async_step_reconfigure implemented.
+  exception-translations: done
+  icon-translations: done
+  reconfiguration-flow: done
   repair-issues: done
   stale-devices:
     status: exempt
     comment: Single device per config entry; nothing to remove as stale.
 
   # Platinum
-  async-dependency:
-    status: todo
-    comment: Not yet re-audited against this rule.
+  async-dependency: done
   inject-websession:
     status: exempt
     comment: bleak communicates over Bluetooth, not HTTP; no web session involved.
   strict-typing:
     status: todo
-    comment: Not yet re-audited against this rule (mypy not run in CI).
+    comment: >-
+      Audited with `mypy --strict`: 82 errors across 12 modules (2026-09-25).
+      Mostly missing return/parameter annotations, `coordinator` typed as the
+      base `DataUpdateCoordinator[dict[str, Any]]` instead of the actual
+      `FliprDataCoordinator` subclass (hides its extra attributes/methods from
+      the type checker), and a few real bleak API nullability gaps
+      (`BleakClient | None`). No CI job runs mypy yet either.

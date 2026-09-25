@@ -22,6 +22,10 @@ from .model import get_flipr_model
 _LOGGER = logging.getLogger(__name__)
 
 
+# Single Bluetooth connection to the device: commands must be serialized.
+PARALLEL_UPDATES = 1
+
+
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
@@ -35,7 +39,6 @@ async def async_setup_entry(
 class FliprActiveMeasuresSwitch(CoordinatorEntity, SwitchEntity):
     _attr_has_entity_name = True
     _attr_translation_key = "active_measures"
-    _attr_icon = "mdi:bluetooth-connect"
     _attr_entity_category = EntityCategory.CONFIG
 
     def __init__(self, coordinator, mac: str, model_name: str) -> None:
@@ -69,20 +72,6 @@ class FliprActiveMeasuresSwitch(CoordinatorEntity, SwitchEntity):
                 "active_measures": True,
                 "bluetooth_status": BT_STATUS_WAITING,
             }
-        )
-        if self.coordinator._is_shutdown:
-            return
-        entry = self.hass.config_entries.async_get_entry(self.coordinator.entry_id)
-        if not entry:
-            _LOGGER.warning(
-                "Cannot resume refresh for %s: config entry no longer available",
-                self.coordinator.safe_mac,
-            )
-            return
-        entry.async_create_background_task(
-            self.hass,
-            self.coordinator.async_request_refresh(),
-            "flipr_resume_refresh",
         )
 
     async def async_turn_off(self, **kwargs) -> None:

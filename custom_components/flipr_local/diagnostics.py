@@ -24,7 +24,7 @@ async def async_get_config_entry_diagnostics(
             "version": entry.version,
             "minor_version": entry.minor_version,
             "data": async_redact_data(dict(entry.data), TO_REDACT),
-            "options": dict(entry.options),
+            "options": async_redact_data(dict(entry.options), TO_REDACT),
         },
         "coordinator": {
             "last_update_success": coordinator.last_update_success,

@@ -20,6 +20,10 @@ from .model import get_flipr_model
 _LOGGER = logging.getLogger(__name__)
 
 
+# Single Bluetooth connection to the device: commands must be serialized.
+PARALLEL_UPDATES = 1
+
+
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
@@ -38,7 +42,6 @@ class FliprForceAnalysisButton(CoordinatorEntity, ButtonEntity):
         super().__init__(coordinator)
         self._mac = mac
         self._attr_unique_id = f"{mac}_force_analysis"
-        self._attr_icon = "mdi:refresh-circle"
         self._attr_device_info = flipr_device_info(mac, model_name)
 
     async def async_press(self) -> None:

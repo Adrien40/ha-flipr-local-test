@@ -50,6 +50,10 @@ from .model import get_flipr_model
 _LOGGER = logging.getLogger(__name__)
 
 
+# Coordinator centralizes updates; entities are read-only.
+PARALLEL_UPDATES = 0
+
+
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
@@ -127,7 +131,6 @@ async def async_setup_entry(
                 None,
                 "mV",
                 category=EntityCategory.DIAGNOSTIC,
-                icon="mdi:lightning-bolt",
                 model_name=model_name,
                 state_class=SensorStateClass.MEASUREMENT,
             ),
@@ -139,7 +142,6 @@ async def async_setup_entry(
                 "mV",
                 1,
                 category=EntityCategory.DIAGNOSTIC,
-                icon="mdi:lightning-bolt-outline",
                 model_name=model_name,
                 state_class=SensorStateClass.MEASUREMENT,
             ),
@@ -151,7 +153,6 @@ async def async_setup_entry(
                 None,
                 2,
                 category=EntityCategory.DIAGNOSTIC,
-                icon="mdi:factory",
                 model_name=model_name,
                 state_class=SensorStateClass.MEASUREMENT,
             ),
@@ -172,7 +173,6 @@ async def async_setup_entry(
                 None,
                 "mV",
                 category=EntityCategory.DIAGNOSTIC,
-                icon="mdi:battery-bluetooth",
                 model_name=model_name,
                 state_class=SensorStateClass.MEASUREMENT,
             ),
@@ -183,7 +183,6 @@ async def async_setup_entry(
                 SensorDeviceClass.TIMESTAMP,
                 None,
                 category=EntityCategory.DIAGNOSTIC,
-                icon="mdi:clock-check",
                 model_name=model_name,
             ),
             FliprSensor(
@@ -193,7 +192,6 @@ async def async_setup_entry(
                 None,
                 None,
                 category=EntityCategory.DIAGNOSTIC,
-                icon="mdi:bluetooth-transfer",
                 model_name=model_name,
             ),
             FliprSyncModeSensor(coordinator, mac_address, model_name),
@@ -216,7 +214,6 @@ class FliprSensor(CoordinatorEntity, SensorEntity):
         unit: str | None = None,
         precision: int | None = None,
         category: EntityCategory | None = None,
-        icon: str | None = None,
         model_name: str = "Flipr",
         options: list[str] | None = None,
         state_class: SensorStateClass | None = None,
@@ -231,7 +228,6 @@ class FliprSensor(CoordinatorEntity, SensorEntity):
         self._attr_suggested_display_precision = precision
         self._attr_entity_category = category
         self._attr_state_class = state_class
-        self._attr_icon = icon
         if options:
             self._attr_options = options
         self._attr_device_info = flipr_device_info(mac, model_name)
@@ -262,16 +258,6 @@ class FliprSyncModeSensor(CoordinatorEntity, SensorEntity):
             return None
         val = self.coordinator.data.get("sync_mode")
         return str(val) if val is not None else None
-
-    @property
-    def icon(self) -> str:
-        icons = {
-            "0": "mdi:power-sleep",
-            "1": "mdi:waves",
-            "2": "mdi:leaf",
-            "3": "mdi:rocket-launch",
-        }
-        return icons.get(self.native_value or "", "mdi:sync-alert")
 
 
 class FliprBluetoothStatusSensor(CoordinatorEntity, SensorEntity):
@@ -306,25 +292,6 @@ class FliprBluetoothStatusSensor(CoordinatorEntity, SensorEntity):
         if not self.coordinator.data:
             return BT_STATUS_WAITING
         return self.coordinator.data.get("bluetooth_status", BT_STATUS_WAITING)
-
-    @property
-    def icon(self) -> str:
-        icons = {
-            BT_STATUS_WAITING: "mdi:bluetooth-off",
-            BT_STATUS_CONNECTING: "mdi:bluetooth-connect",
-            BT_STATUS_WAKING_UP: "mdi:bluetooth-audio",
-            BT_STATUS_REQUESTING: "mdi:bluetooth-transfer",
-            BT_STATUS_READING: "mdi:bluetooth-transfer",
-            BT_STATUS_WRITING_SYNC: "mdi:bluetooth-settings",
-            BT_STATUS_SUCCESS: "mdi:bluetooth",
-            BT_STATUS_SYNC_APPLIED: "mdi:bluetooth-connect",
-            BT_STATUS_ERROR: "mdi:bluetooth-off",
-            BT_STATUS_ERROR_RETRY: "mdi:timer-sand",
-            BT_STATUS_WRITE_FAILED: "mdi:alert-circle",
-            BT_STATUS_PAUSED: "mdi:pause-circle",
-            BT_STATUS_OUT_OF_RANGE: "mdi:bluetooth-off",
-        }
-        return icons.get(self.native_value, "mdi:bluetooth-alert")
 
 
 class FliprRealTimeRSSISensor(CoordinatorEntity, RestoreSensor):
@@ -387,7 +354,6 @@ class FliprNextAnalysisSensor(CoordinatorEntity, SensorEntity):
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_device_class = SensorDeviceClass.TIMESTAMP
     _attr_translation_key = "next_analysis"
-    _attr_icon = "mdi:clock-end"
 
     def __init__(self, coordinator, mac: str, model_name: str) -> None:
         super().__init__(coordinator)

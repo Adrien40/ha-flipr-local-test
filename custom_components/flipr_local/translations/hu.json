@@ -24,7 +24,7 @@
               "reference_time": "🕒 Referenciaidő (ütemezés)"
             },
             "data_description": {
-              "reference_time": "Viszonyítási idő az ütemezett elemzések rendszeres időközökre igazításához (pl. 08:00, 09:00, 10:00... 1 órás intervallum esetén)."
+              "reference_time": "Viszonyítási idő az ütemezett elemzések rendszeres időközökre igazításához (pl. 08:00, 10:00, 12:00... 2 órás intervallum esetén)."
             }
           },
           "probes_calibration": {
@@ -50,6 +50,13 @@
         "description": "Add meg a Bluetooth MAC-címet (pl. AA:BB:CC:DD:EE:FF)",
         "data": {
           "mac_address": "🏷️ Bluetooth MAC-cím"
+        }
+      },
+      "reconfigure": {
+        "title": "Flipr eszköz frissítése",
+        "description": "Irányítsa ezt a bejegyzést egy másik fizikai Flipr eszközre (pl. eszközcsere után). A beállítások, automatizálások és az entitáselőzmények megmaradnak.",
+        "data": {
+          "mac_address": "✍️ Bluetooth MAC-cím"
         }
       }
     },
@@ -95,7 +102,7 @@
               "reference_time": "🕒 Referenciaidő (ütemezés)"
             },
             "data_description": {
-              "reference_time": "Viszonyítási idő az ütemezett elemzések rendszeres időközökre igazításához (pl. 08:00, 09:00, 10:00... 1 órás intervallum esetén)."
+              "reference_time": "Viszonyítási idő az ütemezett elemzések rendszeres időközökre igazításához (pl. 08:00, 10:00, 12:00... 2 órás intervallum esetén)."
             }
           },
           "probes_calibration": {
@@ -303,6 +310,23 @@
     "device_unreachable": {
       "title": "A Flipr nem érhető el",
       "description": "A Flipr szonda ({name}) {days} napja nem válaszol. Ellenőrizze a tápellátást, a hatótávolságot, és hogy egy Bluetooth adapter vagy ESPHome proxy lefedi-e a medence területét."
+    }
+  },
+  "exceptions": {
+    "out_of_range_no_history": {
+      "message": "A Flipr {mac} Bluetooth hatótávolságon kívül van, és nincs elérhető korábbi adat."
+    },
+    "device_not_found": {
+      "message": "A Flipr {mac} Bluetooth-eszköze nem található a nemrégiben észlelt jel ellenére."
+    },
+    "entry_not_available": {
+      "message": "A konfigurációs bejegyzés már nem érhető el."
+    },
+    "connection_timeout_no_history": {
+      "message": "A Flipr {mac} nem volt elérhető {timeout} másodperc után, és nincs elérhető adat."
+    },
+    "unreachable_no_history": {
+      "message": "A Flipr nem érhető el, és nincs elérhető korábbi adat: {error}"
     }
   }
 }

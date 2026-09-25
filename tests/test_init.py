@@ -2,14 +2,24 @@
 
 from __future__ import annotations
 
+from unittest.mock import AsyncMock
+
 import pytest
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.helpers import entity_registry as er
 
+from custom_components.flipr_local import (
+    async_migrate_entry,
+    async_remove_entry,
+    async_unload_entry,
+    update_listener,
+)
 from custom_components.flipr_local.const import (
     CONF_CHLORINE_MODEL,
     CONF_CYA,
+    CONF_MAC_ADDRESS,
     CONF_SYNC_MODE,
+    CONF_USE_GATEWAY,
     DOMAIN,
     PLATFORMS,
 )
@@ -108,6 +118,90 @@ async def test_remove_entry_deletes_stored_data(hass, coordinator, entry, hass_s
     await hass.config_entries.async_remove(entry.entry_id)
     await hass.async_block_till_done()
     assert store_key(MAC) not in hass_storage
+
+
+async def test_update_listener_noop_without_coordinator(hass):
+    """Guards against a stale/duplicate listener call before setup finished."""
+    entry = make_entry()
+    entry.add_to_hass(hass)
+    entry.runtime_data = None
+    await update_listener(hass, entry)  # must not raise
+
+
+async def test_update_listener_skips_refresh_while_shutting_down(
+    hass, coordinator, entry
+):
+    coordinator.async_request_refresh = AsyncMock()
+    coordinator._is_shutdown = True
+    try:
+        hass.config_entries.async_update_entry(
+            entry,
+            options={
+                **entry.options,
+                CONF_SYNC_MODE: "0",
+                CONF_USE_GATEWAY: True,
+            },
+        )
+        await hass.async_block_till_done(wait_background_tasks=True)
+        coordinator.async_request_refresh.assert_not_awaited()
+    finally:
+        coordinator._is_shutdown = False
+
+
+async def test_update_listener_defers_refresh_when_ble_lock_held(
+    hass, coordinator, entry
+):
+    coordinator.async_request_refresh = AsyncMock()
+    await coordinator.ble_lock.acquire()
+    try:
+        hass.config_entries.async_update_entry(
+            entry,
+            options={
+                **entry.options,
+                CONF_SYNC_MODE: "0",
+                CONF_USE_GATEWAY: True,
+            },
+        )
+        await hass.async_block_till_done(wait_background_tasks=True)
+        coordinator.async_request_refresh.assert_not_awaited()
+    finally:
+        coordinator.ble_lock.release()
+
+
+async def test_migrate_entry_rejects_future_major_version(hass):
+    """Called directly: Home Assistant's own core intercepts this case first
+    in the normal setup flow, so the integration's own guard is never
+    reached via `hass.config_entries.async_setup`."""
+    entry = make_entry(version=2)
+    entry.add_to_hass(hass)
+    assert await async_migrate_entry(hass, entry) is False
+
+
+async def test_unload_entry_skips_shutdown_when_platforms_fail(
+    hass, coordinator, entry
+):
+    """If unloading the platforms fails, the coordinator must not be shut down."""
+    original_unload_platforms = hass.config_entries.async_unload_platforms
+    hass.config_entries.async_unload_platforms = AsyncMock(return_value=False)
+    try:
+        assert await async_unload_entry(hass, entry) is False
+        assert coordinator._is_shutdown is False
+    finally:
+        # Restore before returning: the `coordinator` fixture's teardown
+        # calls the real `hass.config_entries.async_unload(...)` right
+        # after this test function returns, and that goes through this
+        # same method to actually unload the platforms and shut the
+        # coordinator down cleanly.
+        hass.config_entries.async_unload_platforms = original_unload_platforms
+
+
+async def test_remove_entry_without_mac_is_a_noop(hass):
+    entry = make_entry()
+    entry.add_to_hass(hass)
+    hass.config_entries.async_update_entry(
+        entry, data={k: v for k, v in entry.data.items() if k != CONF_MAC_ADDRESS}
+    )
+    await async_remove_entry(hass, entry)  # must not raise
 
 
 async def test_setup_survives_first_cycle_failure(setup_integration, ble):

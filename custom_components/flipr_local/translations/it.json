@@ -24,7 +24,7 @@
               "reference_time": "🕒 Orario di Riferimento (Pianificazione)"
             },
             "data_description": {
-              "reference_time": "Ora di riferimento usata per allineare le analisi pianificate a intervalli regolari (es. 08:00, 09:00, 10:00... per un intervallo di 1 ora)."
+              "reference_time": "Ora di riferimento usata per allineare le analisi pianificate a intervalli regolari (es. 08:00, 10:00, 12:00... per un intervallo di 2 ore)."
             }
           },
           "probes_calibration": {
@@ -50,6 +50,13 @@
         "description": "Inserisci l'indirizzo MAC Bluetooth (es. AA:BB:CC:DD:EE:FF)",
         "data": {
           "mac_address": "🏷️ Indirizzo MAC Bluetooth"
+        }
+      },
+      "reconfigure": {
+        "title": "Aggiorna dispositivo Flipr",
+        "description": "Collega questa voce a un altro Flipr fisico (ad es. dopo la sostituzione del dispositivo). Le opzioni, le automazioni e la cronologia delle entità vengono mantenute.",
+        "data": {
+          "mac_address": "✍️ Indirizzo MAC Bluetooth"
         }
       }
     },
@@ -95,7 +102,7 @@
               "reference_time": "🕒 Orario di Riferimento (Pianificazione)"
             },
             "data_description": {
-              "reference_time": "Ora di riferimento usata per allineare le analisi pianificate a intervalli regolari (es. 08:00, 09:00, 10:00... per un intervallo di 1 ora)."
+              "reference_time": "Ora di riferimento usata per allineare le analisi pianificate a intervalli regolari (es. 08:00, 10:00, 12:00... per un intervallo di 2 ore)."
             }
           },
           "probes_calibration": {
@@ -303,6 +310,23 @@
     "device_unreachable": {
       "title": "Flipr non raggiungibile",
       "description": "La sonda Flipr ({name}) non risponde da {days} giorno/i. Controllare l'alimentazione, la portata, e che un adattatore Bluetooth o un proxy ESPHome copra l'area della piscina."
+    }
+  },
+  "exceptions": {
+    "out_of_range_no_history": {
+      "message": "Flipr {mac} è fuori portata Bluetooth e non sono disponibili dati precedenti."
+    },
+    "device_not_found": {
+      "message": "Il dispositivo Bluetooth per Flipr {mac} non è stato trovato nonostante un segnale recente."
+    },
+    "entry_not_available": {
+      "message": "La voce di configurazione non è più disponibile."
+    },
+    "connection_timeout_no_history": {
+      "message": "Non è stato possibile contattare Flipr {mac} dopo {timeout} secondi e non sono disponibili dati."
+    },
+    "unreachable_no_history": {
+      "message": "Flipr non è raggiungibile e non sono disponibili dati precedenti: {error}"
     }
   }
 }

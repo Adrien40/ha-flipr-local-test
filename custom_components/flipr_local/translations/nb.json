@@ -24,7 +24,7 @@
               "reference_time": "🕒 Referansetid (planlegging)"
             },
             "data_description": {
-              "reference_time": "Ankertid brukt til å justere planlagte analyser til faste intervaller (f.eks. 08:00, 09:00, 10:00... for et 1-timers intervall)."
+              "reference_time": "Ankertid brukt til å justere planlagte analyser til faste intervaller (f.eks. 08:00, 10:00, 12:00... for et 2-timers intervall)."
             }
           },
           "probes_calibration": {
@@ -50,6 +50,13 @@
         "description": "Skriv inn Bluetooth MAC-adresse (f.eks. AA:BB:CC:DD:EE:FF)",
         "data": {
           "mac_address": "🏷️ Bluetooth MAC-adresse"
+        }
+      },
+      "reconfigure": {
+        "title": "Oppdater Flipr-enhet",
+        "description": "Pek denne oppføringen mot en annen fysisk Flipr (f.eks. etter å ha byttet enhet). Innstillinger, automatiseringer og enhetshistorikk beholdes.",
+        "data": {
+          "mac_address": "✍️ Bluetooth MAC-adresse"
         }
       }
     },
@@ -95,7 +102,7 @@
               "reference_time": "🕒 Referansetid (planlegging)"
             },
             "data_description": {
-              "reference_time": "Ankertid brukt til å justere planlagte analyser til faste intervaller (f.eks. 08:00, 09:00, 10:00... for et 1-timers intervall)."
+              "reference_time": "Ankertid brukt til å justere planlagte analyser til faste intervaller (f.eks. 08:00, 10:00, 12:00... for et 2-timers intervall)."
             }
           },
           "probes_calibration": {
@@ -303,6 +310,23 @@
     "device_unreachable": {
       "title": "Flipr utilgjengelig",
       "description": "Flipr-sonden ({name}) har ikke svart på {days} dag(er). Kontroller strøm, rekkevidde, og at en Bluetooth-adapter eller ESPHome-proxy dekker bassengområdet."
+    }
+  },
+  "exceptions": {
+    "out_of_range_no_history": {
+      "message": "Flipr {mac} er utenfor Bluetooth-rekkevidde, og ingen tidligere data er tilgjengelige."
+    },
+    "device_not_found": {
+      "message": "Bluetooth-enheten for Flipr {mac} ble ikke funnet til tross for et nylig signal."
+    },
+    "entry_not_available": {
+      "message": "Konfigurasjonsoppføringen er ikke lenger tilgjengelig."
+    },
+    "connection_timeout_no_history": {
+      "message": "Flipr {mac} kunne ikke nås etter {timeout} sekunder, og ingen data er tilgjengelige."
+    },
+    "unreachable_no_history": {
+      "message": "Flipr er utilgjengelig, og ingen tidligere data er tilgjengelige: {error}"
     }
   }
 }

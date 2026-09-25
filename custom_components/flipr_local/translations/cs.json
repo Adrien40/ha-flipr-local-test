@@ -24,7 +24,7 @@
               "reference_time": "🕒 Referenční čas (plánování)"
             },
             "data_description": {
-              "reference_time": "Referenční čas pro zarovnání naplánovaných analýz na pravidelné intervaly (např. 08:00, 09:00, 10:00... pro 1hodinový interval)."
+              "reference_time": "Referenční čas pro zarovnání naplánovaných analýz na pravidelné intervaly (např. 08:00, 10:00, 12:00... pro 2hodinový interval)."
             }
           },
           "probes_calibration": {
@@ -50,6 +50,13 @@
         "description": "Zadejte Bluetooth MAC adresu (např. AA:BB:CC:DD:EE:FF)",
         "data": {
           "mac_address": "🏷️ Bluetooth MAC adresa"
+        }
+      },
+      "reconfigure": {
+        "title": "Aktualizovat zařízení Flipr",
+        "description": "Přiřaďte tento záznam k jinému fyzickému zařízení Flipr (např. po výměně zařízení). Vaše možnosti, automatizace a historie entit zůstanou zachovány.",
+        "data": {
+          "mac_address": "✍️ Bluetooth MAC adresa"
         }
       }
     },
@@ -95,7 +102,7 @@
               "reference_time": "🕒 Referenční čas (plánování)"
             },
             "data_description": {
-              "reference_time": "Referenční čas pro zarovnání naplánovaných analýz na pravidelné intervaly (např. 08:00, 09:00, 10:00... pro 1hodinový interval)."
+              "reference_time": "Referenční čas pro zarovnání naplánovaných analýz na pravidelné intervaly (např. 08:00, 10:00, 12:00... pro 2hodinový interval)."
             }
           },
           "probes_calibration": {
@@ -303,6 +310,23 @@
     "device_unreachable": {
       "title": "Flipr nedostupný",
       "description": "Sonda Flipr ({name}) neodpověděla {days} den/dní. Zkontrolujte napájení, dosah a pokrytí bazénu Bluetooth adaptérem nebo ESPHome proxy."
+    }
+  },
+  "exceptions": {
+    "out_of_range_no_history": {
+      "message": "Flipr {mac} je mimo dosah Bluetooth a nejsou k dispozici žádná předchozí data."
+    },
+    "device_not_found": {
+      "message": "Bluetooth zařízení pro Flipr {mac} nebylo nalezeno navzdory nedávnému signálu."
+    },
+    "entry_not_available": {
+      "message": "Konfigurační záznam již není k dispozici."
+    },
+    "connection_timeout_no_history": {
+      "message": "Flipr {mac} nebylo možné kontaktovat po {timeout} sekundách a nejsou k dispozici žádná data."
+    },
+    "unreachable_no_history": {
+      "message": "Flipr je nedostupný a nejsou k dispozici žádná předchozí data: {error}"
     }
   }
 }

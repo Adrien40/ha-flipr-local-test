@@ -24,7 +24,7 @@
               "reference_time": "🕒 參考時間（排程）"
             },
             "data_description": {
-              "reference_time": "用於將排程分析對齊到固定時段的基準時間（例如1小時間隔對應08:00、09:00、10:00……）。"
+              "reference_time": "用於將排程分析對齊到固定時段的基準時間（例如2小時間隔對應08:00、10:00、12:00……）。"
             }
           },
           "probes_calibration": {
@@ -50,6 +50,13 @@
         "description": "輸入藍牙 MAC 位址 (例如：AA:BB:CC:DD:EE:FF)",
         "data": {
           "mac_address": "🏷️ 藍牙 MAC 位址"
+        }
+      },
+      "reconfigure": {
+        "title": "更新 Flipr 裝置",
+        "description": "將此設定項目指向另一台實體 Flipr（例如更換裝置後）。您的選項、自動化與實體歷史記錄將被保留。",
+        "data": {
+          "mac_address": "✍️ 藍牙 MAC 位址"
         }
       }
     },
@@ -95,7 +102,7 @@
               "reference_time": "🕒 參考時間（排程）"
             },
             "data_description": {
-              "reference_time": "用於將排程分析對齊到固定時段的基準時間（例如1小時間隔對應08:00、09:00、10:00……）。"
+              "reference_time": "用於將排程分析對齊到固定時段的基準時間（例如2小時間隔對應08:00、10:00、12:00……）。"
             }
           },
           "probes_calibration": {
@@ -303,6 +310,23 @@
     "device_unreachable": {
       "title": "Flipr 無法連線",
       "description": "Flipr探頭（{name}）已有{days}天未回應。請檢查電源、信號範圍，以及是否有藍牙轉接器或ESPHome代理涵蓋泳池區域。"
+    }
+  },
+  "exceptions": {
+    "out_of_range_no_history": {
+      "message": "Flipr {mac} 超出藍牙範圍，且沒有可用的歷史資料。"
+    },
+    "device_not_found": {
+      "message": "儘管最近收到過訊號，仍未找到 Flipr {mac} 的藍牙裝置。"
+    },
+    "entry_not_available": {
+      "message": "配置項目已不再可用。"
+    },
+    "connection_timeout_no_history": {
+      "message": "{timeout} 秒後仍無法連線 Flipr {mac}，且沒有可用資料。"
+    },
+    "unreachable_no_history": {
+      "message": "Flipr 無法連線，且沒有可用的歷史資料：{error}"
     }
   }
 }

@@ -45,7 +45,7 @@ async def _call(hass, domain, service, entity, **data):
 
 
 # ---------------------------------------------------------------------------
-# Capteurs
+# Sensors
 # ---------------------------------------------------------------------------
 async def test_measurement_sensors(hass, coordinator):
     def state(key):
@@ -70,10 +70,13 @@ async def test_sensor_shows_unknown_when_value_is_none(hass, coordinator):
     assert hass.states.get(entity_id(hass, "sensor", "ph")).state == STATE_UNKNOWN
 
 
-async def test_next_analysis_is_last_plus_interval(hass, coordinator):
+async def test_next_analysis_matches_scheduled_slot(hass, coordinator):
+    """Next analysis entity must display the aligned scheduled slot."""
     state = hass.states.get(entity_id(hass, "sensor", "next_analysis"))
-    expected = coordinator.data["last_received"] + coordinator.update_interval
-    assert dt_util.parse_datetime(state.state) == expected.replace(microsecond=0)
+    assert coordinator.next_slot is not None
+    assert dt_util.parse_datetime(state.state) == coordinator.next_slot.replace(
+        microsecond=0
+    )
 
 
 async def test_next_analysis_hidden_when_paused(hass, coordinator):
@@ -134,13 +137,14 @@ async def test_sensors_fall_back_to_unknown_with_no_coordinator_data(hass, coord
     assert hass.states.get(entity_id(hass, "sensor", "next_analysis")).state == (
         STATE_UNKNOWN
     )
-    assert hass.states.get(entity_id(hass, "binary_sensor", "ph_status")).state == (
-        STATE_UNKNOWN
+    assert (
+        hass.states.get(entity_id(hass, "binary_sensor", "ph_status")).state
+        == STATE_UNKNOWN
     )
 
 
 # ---------------------------------------------------------------------------
-# Alertes (seuils)
+# Alerts (thresholds)
 # ---------------------------------------------------------------------------
 @pytest.mark.parametrize("key", ["ph_status", "orp_status", "temperature_status"])
 async def test_alerts_off_when_values_in_range(hass, coordinator, key):
@@ -234,7 +238,7 @@ async def test_alert_unknown_when_measurement_missing(hass, coordinator):
 
 
 # ---------------------------------------------------------------------------
-# Nombres : TAC / TH / TDS
+# Numbers: TAC / TH / TDS
 # ---------------------------------------------------------------------------
 async def test_water_parameters_drive_langelier(hass, coordinator):
     for key, value in (("tac", 100), ("th", 200), ("tds", 1000)):
@@ -356,7 +360,7 @@ async def test_switch_pauses_measurements(hass, coordinator):
 
 
 async def test_switch_resume_does_not_request_refresh(hass, coordinator):
-    """Like Blue Connect: turning the switch back on must not trigger an immediate analysis."""
+    """Like Blue Connect: turning switch back on must not trigger immediate analysis."""
     switch = entity_id(hass, "switch", "active_measures")
     await _call(hass, "switch", "turn_off", switch)
     coordinator.async_request_refresh = AsyncMock()
@@ -400,7 +404,7 @@ async def test_button_ignored_while_analysis_running(hass, coordinator):
 
 
 async def test_button_is_not_blocked_when_out_of_range(hass, coordinator, ble):
-    """Like Blue Connect: the button tries the analysis even without a recent advertisement."""
+    """Like Blue Connect: button tries analysis even without recent advertisement."""
     ble.scanner_count = 0
     coordinator.async_request_refresh = AsyncMock()
     await _call(hass, "button", "press", entity_id(hass, "button", "force_analysis"))
@@ -428,8 +432,6 @@ async def test_button_ignored_while_shutting_down(hass, coordinator):
         await hass.async_block_till_done(wait_background_tasks=True)
         coordinator.async_request_refresh.assert_not_awaited()
     finally:
-        # Restore normal state so the `coordinator`/`setup_integration` fixture
-        # can unload the entry cleanly at the end of the test.
         coordinator._is_shutdown = False
 
 
@@ -453,14 +455,11 @@ async def test_button_does_not_schedule_task_when_entry_is_gone(hass, coordinato
         await hass.async_block_till_done(wait_background_tasks=True)
         coordinator.async_request_refresh.assert_not_awaited()
     finally:
-        # Restore before returning: Home Assistant's own entry-unload
-        # machinery (run by the `coordinator` fixture's teardown, right
-        # after this test function returns) relies on this same method.
         hass.config_entries.async_get_entry = original_async_get_entry
 
 
 async def test_raw_orp_is_not_affected_by_calibration_offset(hass, setup_integration):
-    """Raw Redox is used to *establish* the offset: it must stay the probe's value."""
+    """Raw Redox is used to establish the offset: it must stay the probe's value."""
     entry = make_entry(**{"orp_calib": 640, "orp_ref": 650})
     await setup_integration(entry)
     raw = hass.states.get(entity_id(hass, "sensor", "orp_raw"))
@@ -512,10 +511,10 @@ async def test_every_threshold_boundary(
     }
 
     for key, threshold, expected in (
-        (low_key, measured, STATE_OFF),  # mesure == seuil bas
-        (low_key, measured + step, STATE_ON),  # mesure < seuil bas
-        (high_key, measured, STATE_OFF),  # mesure == seuil haut
-        (high_key, measured - step, STATE_ON),  # mesure > seuil haut
+        (low_key, measured, STATE_OFF),  # measurement == low threshold
+        (low_key, measured + step, STATE_ON),  # measurement < low threshold
+        (high_key, measured, STATE_OFF),  # measurement == high threshold
+        (high_key, measured - step, STATE_ON),  # measurement > high threshold
     ):
         hass.config_entries.async_update_entry(
             entry, options={**entry.options, **wide, key: threshold}
@@ -552,7 +551,7 @@ async def test_rssi_is_available_again_when_signal_returns(hass, coordinator, bl
 async def test_rssi_unavailable_when_signal_disappears_between_polls(
     hass, coordinator, ble
 ):
-    """Even without a loss callback, a scheduled cycle notices the absence and updates."""
+    """Even without a loss callback, scheduled cycle notices absence and updates."""
     rssi = entity_id(hass, "sensor", "rssi")
     ble.last_seen_age = 500
     await coordinator.async_refresh()
